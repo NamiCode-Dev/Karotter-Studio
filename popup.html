@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karotter Studio</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <main class="popup-shell">
+    <header class="hero-card">
+      <div class="hero-top">
+        <div class="hero-id">
+          <h1>Karotter Studio</h1>
+        </div>
+      </div>
+
+      <p class="hero-copy">Karotter を自分好みの最高の空間へ。テーマ変更から機能拡張まで、あなたのブラウジングをデザインします。</p>
+
+      <div class="action-card">
+        <label class="toggle-row" for="enabledToggle">
+          <div class="toggle-info">
+            <div class="toggle-title">機能を有効にする</div>
+            <div class="toggle-status" id="toggleHelp">読み込み中...</div>
+          </div>
+          <span class="switch">
+            <input id="enabledToggle" type="checkbox">
+            <span class="switch-ui"></span>
+          </span>
+        </label>
+      </div>
+    </header>
+
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="appearance">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+        </svg>
+        <span>外観</span>
+      </button>
+      <button class="tab-btn" data-tab="features">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polygon
+            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+        <span>機能拡張</span>
+      </button>
+      <button class="tab-btn" data-tab="advanced">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+        <span>その他</span>
+      </button>
+    </nav>
+
+    <div class="panels-container">
+      <!-- Appearance Tab -->
+      <div id="appearanceTab" class="tab-pane active">
+        <section class="panel">
+          <div class="section-head">
+            <p class="section-kicker">Custom Theme</p>
+            <h2>テーマの適用</h2>
+          </div>
+          <label class="toggle-row mini" for="customTheme">
+            <div class="toggle-info">
+              <div class="toggle-title">カスタムテーマを有効にする</div>
+              <div class="toggle-desc">生成された配色を Karotter に適用します。</div>
+            </div>
+            <span class="switch small">
+              <input id="customTheme" type="checkbox">
+              <span class="switch-ui"></span>
+            </span>
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="section-head section-head-with-badge">
+            <div>
+              <p class="section-kicker">Backdrop</p>
+              <h2>背景画像の設定</h2>
+            </div>
+            <span class="beta-badge">Beta</span>
+          </div>
+
+          <div class="background-config">
+            <label class="toggle-row mini" for="backgroundToggle">
+              <div class="toggle-info">
+                <div class="toggle-title">背景画像を有効にする</div>
+                <div class="toggle-status" id="backgroundHelp">画像未設定</div>
+              </div>
+              <span class="switch small">
+                <input id="backgroundToggle" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
+            <div class="image-stage">
+              <div class="image-dropzone" id="backgroundPreview">
+                <div class="dropzone-content">
+                  <div class="dropzone-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <polyline points="21 15 16 10 5 21" />
+                    </svg>
+                  </div>
+                  <span id="backgroundLabel">画像をドラッグまたは選択</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sliders-grid compact">
+              <div class="slider-item">
+                <div class="slider-head">
+                  <span class="slider-label">画像の不透明度</span>
+                </div>
+                <input id="imageOpacityRange" type="range" min="0" max="100" value="100">
+              </div>
+              <div class="slider-item">
+                <div class="slider-head">
+                  <span class="slider-label">UIの不透明度</span>
+                </div>
+                <input id="surfaceOpacityRange" type="range" min="0" max="100" value="100">
+              </div>
+            </div>
+
+            <input id="backgroundInput" type="file" accept="image/*" hidden>
+            <div class="action-row">
+              <button id="backgroundPickBtn" class="btn btn-secondary" type="button">画像を選択</button>
+              <button id="backgroundClearBtn" class="btn btn-ghost" type="button">削除</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <p class="section-kicker">Appearance</p>
+            <h2>ベースカラーと配色</h2>
+          </div>
+
+          <div class="settings-group">
+            <div class="field">
+              <span class="field-label">ベースカラー</span>
+              <div class="color-picker-modern">
+                <div class="color-preview-wrapper">
+                  <input id="seedColor" type="color" value="#1d9bf0">
+                  <div class="color-preview-overlay" id="colorPreviewOverlay"></div>
+                </div>
+                <input id="seedHex" type="text" value="#1d9bf0" spellcheck="false" maxlength="7">
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="field-label">配色モード</span>
+              <div class="segmented-control" id="modeSegmentedControl">
+                <button type="button" class="segment" data-value="light">ライト</button>
+                <button type="button" class="segment" data-value="dim">ディム</button>
+                <button type="button" class="segment" data-value="dark">ダーク</button>
+                <div class="segment-indicator"></div>
+              </div>
+              <select id="modeSelect" style="display: none;">
+                <option value="light">ライト</option>
+                <option value="dim">ディム</option>
+                <option value="dark">ダーク</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="sliders-grid">
+            <div class="slider-item">
+              <div class="slider-head">
+                <span class="slider-label">彩度の調整</span>
+                <output class="slider-value" id="saturationValue">0</output>
+              </div>
+              <input id="saturationRange" type="range" min="-40" max="40" value="0">
+            </div>
+
+            <div class="slider-item">
+              <div class="slider-head">
+                <span class="slider-label">明るさの調整</span>
+                <output class="slider-value" id="lightnessValue">0</output>
+              </div>
+              <input id="lightnessRange" type="range" min="-30" max="30" value="0">
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <p class="section-kicker">Palette Monitor</p>
+            <h2>生成されたパレット</h2>
+          </div>
+          <div class="swatches-monitor" id="swatches"></div>
+        </section>
+      </div>
+
+      <!-- Features Tab -->
+      <div id="featuresTab" class="tab-pane">
+        <section class="panel">
+          <div class="section-head">
+            <p class="section-kicker">Advanced</p>
+            <h2>コンテンツと表示制御</h2>
+          </div>
+
+          <div class="features-list">
+            <label class="toggle-row mini" for="imageDownload">
+              <div class="toggle-info">
+                <div class="toggle-title">画像のダウンロードボタン</div>
+                <div class="toggle-desc">投稿画像の右下に保存ボタンを表示します。</div>
+              </div>
+              <span class="switch small">
+                <input id="imageDownload" type="checkbox" checked>
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
+            <label class="toggle-row mini" for="collapseSidebarSections">
+              <div class="toggle-info">
+                <div class="toggle-title">サイドバーの折りたたみ</div>
+                <div class="toggle-desc">右サイドバーの各セクションを折りたたむボタンを追加します。</div>
+              </div>
+              <span class="switch small">
+                <input id="collapseSidebarSections" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
+            <label class="toggle-row mini sub-option" for="collapseSidebarInitially"
+              style="margin-left: 16px; opacity: 0.6; pointer-events: none;">
+              <div class="toggle-info">
+                <div class="toggle-title">初期状態で折りたたむ</div>
+                <div class="toggle-desc">ページ読み込み時に最初から折りたたんだ状態にします。</div>
+              </div>
+              <span class="switch small">
+                <input id="collapseSidebarInitially" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
+            <label class="toggle-row mini" for="autoExpandMore">
+              <div class="toggle-info">
+                <div class="toggle-title">「もっと見る」を自動展開</div>
+                <div class="toggle-desc">ページ内の「もっと見る」ボタンを自動的にクリックします。</div>
+              </div>
+              <span class="switch small">
+                <input id="autoExpandMore" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
+            <label class="toggle-row mini" for="hideSpoilers">
+              <div class="toggle-info">
+                <div class="toggle-title">ネタバレ防止</div>
+                <div class="toggle-desc">指定した単語を黒塗りにします。ホバーで表示されます。</div>
+              </div>
+              <span class="switch small">
+                <input id="hideSpoilers" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
+            <div class="field sub-option" id="spoilerKeywordsContainer" style="margin-left: 16px; margin-top: 8px;">
+              <span class="field-label" style="font-size: 11px; opacity: 0.8;">ネタバレ単語（カンマ区切り）</span>
+              <div style="display: flex; gap: 8px; margin-top: 4px;">
+                <input id="spoilerKeywords" type="text" placeholder="例: 犯人, 死ぬ, 結末"
+                  style="padding: 6px 8px; font-size: 12px; flex: 1;">
+                <button id="saveSpoilersBtn" class="btn btn-secondary btn-small" type="button"
+                  style="padding: 4px 12px; font-size: 12px;">保存</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <p class="section-kicker">Interactions</p>
+            <h2>UIの簡素化</h2>
+          </div>
+
+          <div class="features-list">
+            <label class="toggle-row mini" for="hideReactions">
+              <div class="toggle-info">
+                <div class="toggle-title">リアクションを非表示</div>
+                <div class="toggle-desc">投稿の下に表示されるリアクションボタンを隠します。</div>
+              </div>
+              <span class="switch small">
+                <input id="hideReactions" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
+            <label class="toggle-row mini" for="hideViewCount">
+              <div class="toggle-info">
+                <div class="toggle-title">表示回数を非表示</div>
+                <div class="toggle-desc">ポストの閲覧数などの数値を非表示にします。</div>
+              </div>
+              <span class="switch small">
+                <input id="hideViewCount" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
+            <label class="toggle-row mini" for="hideVerificationMark">
+              <div class="toggle-info">
+                <div class="toggle-title">公式マークを非表示</div>
+                <div class="toggle-desc">名前の横に表示される公式マークを隠します。</div>
+              </div>
+              <span class="switch small">
+                <input id="hideVerificationMark" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+          </div>
+        </section>
+      </div>
+
+      <!-- Advanced Tab -->
+      <div id="advancedTab" class="tab-pane">
+        <section class="panel">
+          <div class="section-head">
+            <p class="section-kicker">Navigation</p>
+            <h2>表示モード</h2>
+          </div>
+
+          <label class="toggle-row mini" for="useSidePanel">
+            <div class="toggle-info">
+              <div class="toggle-title">サイドパネルで開く</div>
+              <div class="toggle-desc">有効にすると、アイコンクリック時にブラウザのサイドパネルで表示します。</div>
+            </div>
+            <span class="switch small">
+              <input id="useSidePanel" type="checkbox">
+              <span class="switch-ui"></span>
+            </span>
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <p class="section-kicker">System</p>
+            <h2>高度な設定</h2>
+          </div>
+
+          <div class="advanced-actions">
+            <p class="hero-copy">すべての設定をリセットし、初期状態に戻します。この操作は取り消せません。</p>
+            <button id="resetBtn" class="btn btn-danger w-full" type="button">設定を初期化する</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <p class="section-kicker">About</p>
+            <h2>Karotter Studio について</h2>
+          </div>
+          <p class="hero-copy" style="margin-top: 12px; font-size: 13px;">
+            Karotter Studio は、Karotter をより快適に、自分好みにカスタマイズするための拡張機能です。<br><br>
+            Version: 1.0.0
+          </p>
+        </section>
+      </div>
+    </div>
+
+    <footer class="studio-footer">
+      <button id="openSiteBtn" class="btn btn-primary" type="button">
+        <span>Launch Karotter</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+          <polyline points="15 3 21 3 21 9" />
+          <line x1="10" y1="14" x2="21" y2="3" />
+        </svg>
+      </button>
+    </footer>
+  </main>
+
+  <script src="theme-engine.js"></script>
+  <script src="storage.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>

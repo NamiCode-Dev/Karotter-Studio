@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Karotter Studio",
+  "version": "1.0.0",
+  "description": "Karotterをより快適に。より柔軟にカスタマイズ。",
+  "permissions": [
+    "storage",
+    "sidePanel",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://karotter.com/*"
+  ],
+  "action": {
+    "default_title": "Karotter Studio",
+    "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://karotter.com/*"
+      ],
+      "js": [
+        "theme-engine.js",
+        "storage.js",
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}

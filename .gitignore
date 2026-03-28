@@ -1,0 +1,25 @@
+# OS specific files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE - VS Code
+.vscode/
+
+# IDE - WebStorm
+.idea/
+
+# Local configuration
+.env
+.env.local
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist/
+build/
+out/
