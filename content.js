@@ -68,8 +68,18 @@
     if (features.enhanceVideoPlayer) {
       css += `
         .karotter-video-container { 
-          position: relative !important; overflow: hidden !important; border-radius: 12px !important;
+          position: absolute !important; top: 0; left: 0; right: 0; bottom: 0;
+          width: 100% !important; height: 100% !important;
+          overflow: hidden !important; border-radius: inherit !important;
           background: #000;
+          display: flex !important; justify-content: center !important; align-items: center !important;
+          z-index: 1;
+        }
+        .karotter-video-container video {
+          position: absolute !important; top: 0; left: 0;
+          width: 100% !important; height: 100% !important;
+          max-width: 100% !important; max-height: 100% !important;
+          object-fit: contain !important; margin: auto !important;
         }
         .karotter-video-container:fullscreen {
           display: flex; align-items: center; justify-content: center;
