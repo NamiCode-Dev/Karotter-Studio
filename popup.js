@@ -174,6 +174,7 @@
     elements.enhanceVideoPlayer.checked = settings.features.enhanceVideoPlayer;
     elements.hideQrCode.checked = settings.features.hideQrCode;
     elements.hideProfileUrl.checked = settings.features.hideProfileUrl;
+    elements.enableAdvancedSearch.checked = settings.features.enableAdvancedSearch;
     updateSubOptionStates();
   }
 
