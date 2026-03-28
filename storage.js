@@ -23,13 +23,19 @@
         customTheme: true,
         hideReactions: false,
         hideViewCount: false,
-        hideVerificationMark: false,
+        hideIdentityMark: false,
+        hideOperatorMark: false,
+        hideVerifiedGroupMark: false,
+        enhanceVideoPlayer: false,
         collapseSidebarSections: false,
         collapseSidebarInitially: false,
         hideSpoilers: false,
         spoilerKeywords: "",
         autoExpandMore: false,
-        imageDownload: false
+        imageDownload: false,
+        hideQrCode: false,
+        hideProfileUrl: false,
+        enableAdvancedSearch: false
       },
       useSidePanel: false
     };
@@ -66,13 +72,19 @@
       customTheme: typeof features.customTheme === "boolean" ? features.customTheme : true,
       hideReactions: Boolean(features.hideReactions),
       hideViewCount: Boolean(features.hideViewCount),
-      hideVerificationMark: Boolean(features.hideVerificationMark),
+      hideIdentityMark: Boolean(features.hideIdentityMark),
+      hideOperatorMark: Boolean(features.hideOperatorMark),
+      hideVerifiedGroupMark: Boolean(features.hideVerifiedGroupMark),
+      enhanceVideoPlayer: Boolean(features.enhanceVideoPlayer),
       collapseSidebarSections: Boolean(features.collapseSidebarSections),
       collapseSidebarInitially: Boolean(features.collapseSidebarInitially),
       hideSpoilers: Boolean(features.hideSpoilers),
       spoilerKeywords: typeof features.spoilerKeywords === "string" ? features.spoilerKeywords : "",
       autoExpandMore: Boolean(features.autoExpandMore),
-      imageDownload: Boolean(features.imageDownload)
+      imageDownload: Boolean(features.imageDownload),
+      hideQrCode: Boolean(features.hideQrCode),
+      hideProfileUrl: Boolean(features.hideProfileUrl),
+      enableAdvancedSearch: Boolean(features.enableAdvancedSearch)
     };
   }
 

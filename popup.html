@@ -162,12 +162,14 @@
               <span class="field-label">配色モード</span>
               <div class="segmented-control" id="modeSegmentedControl">
                 <button type="button" class="segment" data-value="light">ライト</button>
+                <button type="button" class="segment" data-value="soft">ソフト</button>
                 <button type="button" class="segment" data-value="dim">ディム</button>
                 <button type="button" class="segment" data-value="dark">ダーク</button>
                 <div class="segment-indicator"></div>
               </div>
               <select id="modeSelect" style="display: none;">
                 <option value="light">ライト</option>
+                <option value="soft">ソフト</option>
                 <option value="dim">ディム</option>
                 <option value="dark">ダーク</option>
               </select>
@@ -211,6 +213,28 @@
           </div>
 
           <div class="features-list">
+            <label class="toggle-row mini" for="enableAdvancedSearch">
+              <div class="toggle-info">
+                <div class="toggle-title">高度な検索UIを追加</div>
+                <div class="toggle-desc">検索ボックスの横に、詳細検索（from, to, since等）を開くアイコンを追加します。</div>
+              </div>
+              <span class="switch small">
+                <input id="enableAdvancedSearch" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
+            <label class="toggle-row mini" for="enhanceVideoPlayer">
+              <div class="toggle-info">
+                <div class="toggle-title">スタジオ動画プレイヤー</div>
+                <div class="toggle-desc">動画にカスタムコントロールを追加し、詳細な操作を可能にします。</div>
+              </div>
+              <span class="switch small">
+                <input id="enhanceVideoPlayer" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
             <label class="toggle-row mini" for="imageDownload">
               <div class="toggle-info">
                 <div class="toggle-title">画像のダウンロードボタン</div>
@@ -218,6 +242,17 @@
               </div>
               <span class="switch small">
                 <input id="imageDownload" type="checkbox" checked>
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
+            <label class="toggle-row mini" for="autoExpandMore">
+              <div class="toggle-info">
+                <div class="toggle-title">「もっと見る」を自動展開</div>
+                <div class="toggle-desc">ページ内の「もっと見る」ボタンを自動的にクリックします。</div>
+              </div>
+              <span class="switch small">
+                <input id="autoExpandMore" type="checkbox">
                 <span class="switch-ui"></span>
               </span>
             </label>
@@ -241,17 +276,6 @@
               </div>
               <span class="switch small">
                 <input id="collapseSidebarInitially" type="checkbox">
-                <span class="switch-ui"></span>
-              </span>
-            </label>
-
-            <label class="toggle-row mini" for="autoExpandMore">
-              <div class="toggle-info">
-                <div class="toggle-title">「もっと見る」を自動展開</div>
-                <div class="toggle-desc">ページ内の「もっと見る」ボタンを自動的にクリックします。</div>
-              </div>
-              <span class="switch small">
-                <input id="autoExpandMore" type="checkbox">
                 <span class="switch-ui"></span>
               </span>
             </label>
@@ -308,16 +332,61 @@
               </span>
             </label>
 
-            <label class="toggle-row mini" for="hideVerificationMark">
+            <label class="toggle-row mini" for="hideIdentityMark">
               <div class="toggle-info">
-                <div class="toggle-title">公式マークを非表示</div>
-                <div class="toggle-desc">名前の横に表示される公式マークを隠します。</div>
+                <div class="toggle-title">本人マークを非表示</div>
+                <div class="toggle-desc">名前の横に表示される本人マークを隠します。</div>
               </div>
               <span class="switch small">
-                <input id="hideVerificationMark" type="checkbox">
+                <input id="hideIdentityMark" type="checkbox" checked>
                 <span class="switch-ui"></span>
               </span>
             </label>
+
+            <label class="toggle-row mini" for="hideOperatorMark">
+              <div class="toggle-info">
+                <div class="toggle-title">運営マークを非表示</div>
+                <div class="toggle-desc">名前の横に表示される運営マークを隠します。</div>
+              </div>
+              <span class="switch small">
+                <input id="hideOperatorMark" type="checkbox" checked>
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
+            <label class="toggle-row mini" for="hideVerifiedGroupMark">
+              <div class="toggle-info">
+                <div class="toggle-title">認証済み団体マークを非表示</div>
+                <div class="toggle-desc">名前の横に表示される認証済み団体マークを隠します。</div>
+              </div>
+              <span class="switch small">
+                <input id="hideVerifiedGroupMark" type="checkbox" checked>
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+            
+            <label class="toggle-row mini" for="hideQrCode">
+              <div class="toggle-info">
+                <div class="toggle-title">QRを表示を非表示</div>
+                <div class="toggle-desc">プロフィールの「QRを表示」ボタンを隠します。</div>
+              </div>
+              <span class="switch small">
+                <input id="hideQrCode" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+            
+            <label class="toggle-row mini" for="hideProfileUrl">
+              <div class="toggle-info">
+                <div class="toggle-title">プロフィールURLを非表示</div>
+                <div class="toggle-desc">プロフィールの「プロフィールURLをコピー」ボタンを隠します。</div>
+              </div>
+              <span class="switch small">
+                <input id="hideProfileUrl" type="checkbox">
+                <span class="switch-ui"></span>
+              </span>
+            </label>
+
           </div>
         </section>
       </div>
@@ -361,7 +430,7 @@
           </div>
           <p class="hero-copy" style="margin-top: 12px; font-size: 13px;">
             Karotter Studio は、Karotter をより快適に、自分好みにカスタマイズするための拡張機能です。<br><br>
-            Version: 1.0.0
+            Version: 1.1.0
           </p>
         </section>
       </div>

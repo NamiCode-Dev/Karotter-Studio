@@ -31,7 +31,9 @@
     hideReactions: document.getElementById("hideReactions"),
     customTheme: document.getElementById("customTheme"),
     hideViewCount: document.getElementById("hideViewCount"),
-    hideVerificationMark: document.getElementById("hideVerificationMark"),
+    hideIdentityMark: document.getElementById("hideIdentityMark"),
+    hideOperatorMark: document.getElementById("hideOperatorMark"),
+    hideVerifiedGroupMark: document.getElementById("hideVerifiedGroupMark"),
     collapseSidebarSections: document.getElementById("collapseSidebarSections"),
     collapseSidebarInitially: document.getElementById("collapseSidebarInitially"),
     useSidePanel: document.getElementById("useSidePanel"),
@@ -40,6 +42,10 @@
     saveSpoilersBtn: document.getElementById("saveSpoilersBtn"),
     autoExpandMore: document.getElementById("autoExpandMore"),
     imageDownload: document.getElementById("imageDownload"),
+    enhanceVideoPlayer: document.getElementById("enhanceVideoPlayer"),
+    hideQrCode: document.getElementById("hideQrCode"),
+    hideProfileUrl: document.getElementById("hideProfileUrl"),
+    enableAdvancedSearch: document.getElementById("enableAdvancedSearch"),
     tabBtns: document.querySelectorAll(".tab-btn"),
     tabPanes: document.querySelectorAll(".tab-pane")
   };
@@ -69,7 +75,8 @@
     segments.forEach((seg, index) => {
       if (seg.dataset.value === generator.mode) {
         seg.classList.add("active");
-        indicator.style.transform = `translateX(${index * 100}%)`;
+        indicator.style.width = seg.offsetWidth + "px";
+        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
       } else {
         seg.classList.remove("active");
       }
@@ -154,7 +161,9 @@
     elements.hideReactions.checked = settings.features.hideReactions;
     elements.customTheme.checked = settings.features.customTheme;
     elements.hideViewCount.checked = settings.features.hideViewCount;
-    elements.hideVerificationMark.checked = settings.features.hideVerificationMark;
+    elements.hideIdentityMark.checked = settings.features.hideIdentityMark;
+    elements.hideOperatorMark.checked = settings.features.hideOperatorMark;
+    elements.hideVerifiedGroupMark.checked = settings.features.hideVerifiedGroupMark;
     elements.collapseSidebarSections.checked = settings.features.collapseSidebarSections;
     elements.collapseSidebarInitially.checked = settings.features.collapseSidebarInitially;
     elements.useSidePanel.checked = settings.useSidePanel;
@@ -162,6 +171,9 @@
     elements.spoilerKeywords.value = settings.features.spoilerKeywords;
     elements.autoExpandMore.checked = settings.features.autoExpandMore;
     elements.imageDownload.checked = settings.features.imageDownload;
+    elements.enhanceVideoPlayer.checked = settings.features.enhanceVideoPlayer;
+    elements.hideQrCode.checked = settings.features.hideQrCode;
+    elements.hideProfileUrl.checked = settings.features.hideProfileUrl;
     updateSubOptionStates();
   }
 
@@ -329,7 +341,8 @@
     segments.forEach((seg, index) => {
       if (seg === btn) {
         seg.classList.add("active");
-        indicator.style.transform = `translateX(${index * 100}%)`;
+        indicator.style.width = seg.offsetWidth + "px";
+        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
       } else {
         seg.classList.remove("active");
       }
@@ -386,7 +399,7 @@
   });
 
   // Feature Toggles
-  ["hideReactions", "customTheme", "hideViewCount", "hideVerificationMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload"].forEach(featureKey => {
+  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch"].forEach(featureKey => {
     const el = elements[featureKey];
     if (el) {
       el.addEventListener("change", function () {

@@ -96,7 +96,7 @@
     "neutral-950"
   ];
 
-  const generatorModes = ["light", "dim", "dark"];
+  const generatorModes = ["light", "soft", "dim", "dark"];
   const opaqueColorKeys = {
     "text-primary": true,
     "text-secondary": true,
@@ -297,31 +297,45 @@
         neutralSFactor: 0.18,
         surfaceSFactor: 0.2,
         textSFactor: 0.26
+      },
+      soft: {
+        bgL: 92,
+        cardL: 96,
+        elevL: 94,
+        softL: 88,
+        text1L: 15,
+        text2L: 28,
+        text3L: 42,
+        neutralStart: 90,
+        neutralEnd: 22,
+        neutralSFactor: 0.35,
+        surfaceSFactor: 0.4,
+        textSFactor: 0.22
       }
     };
 
     const profile = profiles[normalizedMode];
-    const neutralSaturation = clamp(adjustedSaturation * profile.neutralSFactor, 4, 26);
-    const surfaceSaturation = clamp(adjustedSaturation * profile.surfaceSFactor, 6, 34);
-    const textSaturation = clamp(adjustedSaturation * profile.textSFactor, 2, 20);
+    const neutralSaturation = clamp(adjustedSaturation * profile.neutralSFactor, 4, 32);
+    const surfaceSaturation = clamp(adjustedSaturation * profile.surfaceSFactor, 6, 42);
+    const textSaturation = clamp(adjustedSaturation * profile.textSFactor, 2, 24);
     const accent = hslToHex(hsl.h, clamp(adjustedSaturation, 38, 95), adjustedLightness);
     const linkAccent = hslToHex(
       hsl.h,
       clamp(adjustedSaturation + 5, 40, 98),
-      clamp(adjustedLightness + (normalizedMode === "light" ? -8 : 10), 35, 82)
+      clamp(adjustedLightness + (normalizedMode === "light" || normalizedMode === "soft" ? -8 : 10), 35, 82)
     );
     const linkAccentHover = hslToHex(
       hsl.h,
       clamp(adjustedSaturation, 36, 95),
-      clamp(adjustedLightness + (normalizedMode === "light" ? -14 : 18), 28, 90)
+      clamp(adjustedLightness + (normalizedMode === "light" || normalizedMode === "soft" ? -14 : 18), 28, 90)
     );
-    const borderAlpha = normalizedMode === "light" ? 0.1 : 0.3;
-    const accentAlpha = normalizedMode === "light" ? 0.08 : 0.18;
-    const surfaceShadow = normalizedMode === "light"
+    const borderAlpha = (normalizedMode === "light" || normalizedMode === "soft") ? 0.1 : 0.3;
+    const accentAlpha = (normalizedMode === "light" || normalizedMode === "soft") ? 0.08 : 0.18;
+    const surfaceShadow = (normalizedMode === "light" || normalizedMode === "soft")
       ? "0 18px 38px rgba(16, 33, 50, .08)"
       : "0 24px 55px rgba(0, 0, 0, .35)";
 
-    const neutralSteps = normalizedMode === "light"
+    const neutralSteps = (normalizedMode === "light" || normalizedMode === "soft")
       ? [96, 92, 88, 80, 68, 56, 44, 32, 22, 14, 8]
       : [16, 22, 30, 40, 52, 62, 72, 82, 26, 18, 12];
 
@@ -329,28 +343,28 @@
       "app-bg": hslToHex(
         hsl.h,
         surfaceSaturation,
-        clamp(profile.bgL + (normalizedMode === "light" ? shifts.lightness * 0.4 : shifts.lightness * 0.15), 4, 99)
+        clamp(profile.bgL + (normalizedMode === "light" || normalizedMode === "soft" ? shifts.lightness * 0.4 : shifts.lightness * 0.15), 4, 99)
       ),
       "surface-card": hslToHex(
         hsl.h,
         surfaceSaturation,
-        clamp(profile.cardL + (normalizedMode === "light" ? shifts.lightness * 0.25 : shifts.lightness * 0.18), 6, 99)
+        clamp(profile.cardL + (normalizedMode === "light" || normalizedMode === "soft" ? shifts.lightness * 0.25 : shifts.lightness * 0.18), 6, 99)
       ),
       "surface-elevated": hslToHex(
         hsl.h,
         surfaceSaturation,
-        clamp(profile.elevL + (normalizedMode === "light" ? shifts.lightness * 0.2 : shifts.lightness * 0.16), 6, 99)
+        clamp(profile.elevL + (normalizedMode === "light" || normalizedMode === "soft" ? shifts.lightness * 0.2 : shifts.lightness * 0.16), 6, 99)
       ),
       "surface-soft": hslToHex(
         hsl.h,
-        clamp(surfaceSaturation + (normalizedMode === "light" ? 2 : 4), 6, 40),
-        clamp(profile.softL + (normalizedMode === "light" ? shifts.lightness * 0.2 : shifts.lightness * 0.18), 8, 96)
+        clamp(surfaceSaturation + (normalizedMode === "light" || normalizedMode === "soft" ? 2 : 4), 6, 40),
+        clamp(profile.softL + (normalizedMode === "light" || normalizedMode === "soft" ? shifts.lightness * 0.2 : shifts.lightness * 0.18), 8, 96)
       ),
       "text-primary": hslToHex(hsl.h, textSaturation, profile.text1L),
       "text-secondary": hslToHex(hsl.h, textSaturation, profile.text2L),
       "text-muted": hslToHex(hsl.h, textSaturation, profile.text3L),
       "border-soft": "hsla(" + Math.round(hsl.h) + "," + Math.round(clamp(neutralSaturation + 4, 4, 30)) + "%," +
-        (normalizedMode === "light" ? 38 : 72) + "%," + borderAlpha + ")",
+        (normalizedMode === "light" || normalizedMode === "soft" ? 38 : 72) + "%," + borderAlpha + ")",
       "accent": accent,
       "accent-soft": "hsla(" + Math.round(hsl.h) + "," + Math.round(clamp(adjustedSaturation, 38, 95)) + "%," +
         Math.round(adjustedLightness) + "%," + accentAlpha + ")",
