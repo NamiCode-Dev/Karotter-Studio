@@ -81,6 +81,29 @@
         </section>
 
         <section class="panel">
+          <div class="section-head">
+            <p class="section-kicker">Typography</p>
+            <h2>フォントの設定</h2>
+          </div>
+          <div class="field">
+            <span class="field-label" style="margin-bottom: 8px;">フォントを選択</span>
+            <div class="segmented-control font-control" id="fontSegmentedControl">
+              <button type="button" class="segment" data-value="system">システム</button>
+              <button type="button" class="segment" data-value="mushin"
+                style="font-family: 'mushin', sans-serif;">無心</button>
+              <button type="button" class="segment" data-value="timemachine-wa"
+                style="font-family: 'timemachine-wa', sans-serif;">タイムマシンわ号 </button>
+              <div class="segment-indicator"></div>
+            </div>
+            <select id="fontSelect" style="display: none;">
+              <option value="system">システム</option>
+              <option value="mushin">無心</option>
+              <option value="timemachine-wa">タイム</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="panel">
           <div class="section-head section-head-with-badge">
             <div>
               <p class="section-kicker">Backdrop</p>
@@ -364,7 +387,7 @@
                 <span class="switch-ui"></span>
               </span>
             </label>
-            
+
             <label class="toggle-row mini" for="hideQrCode">
               <div class="toggle-info">
                 <div class="toggle-title">QRを表示を非表示</div>
@@ -375,7 +398,7 @@
                 <span class="switch-ui"></span>
               </span>
             </label>
-            
+
             <label class="toggle-row mini" for="hideProfileUrl">
               <div class="toggle-info">
                 <div class="toggle-title">プロフィールURLを非表示</div>
@@ -430,7 +453,7 @@
           </div>
           <p class="hero-copy" style="margin-top: 12px; font-size: 13px;">
             Karotter Studio は、Karotter をより快適に、自分好みにカスタマイズするための拡張機能です。<br><br>
-            Version: 1.1.0
+            Version: 1.2.0
           </p>
         </section>
       </div>

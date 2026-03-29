@@ -1,3 +1,12 @@
+@font-face {
+  font-family: 'mushin';
+  src: url('font/mushin.otf') format('opentype');
+}
+@font-face {
+  font-family: 'timemachine-wa';
+  src: url('font/timemachine-wa.ttf') format('truetype');
+}
+
 :root {
   color-scheme: dark;
   --bg-base: #05080f;

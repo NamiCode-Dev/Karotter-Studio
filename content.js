@@ -76,10 +76,10 @@
           z-index: 1;
         }
         .karotter-video-container video {
-          position: absolute !important; top: 0; left: 0;
-          width: 100% !important; height: 100% !important;
+          display: block !important;
           max-width: 100% !important; max-height: 100% !important;
-          object-fit: contain !important; margin: auto !important;
+          width: auto !important; height: auto !important;
+          object-fit: contain !important;
         }
         .karotter-video-container:fullscreen {
           display: flex; align-items: center; justify-content: center;

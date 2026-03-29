@@ -37,6 +37,7 @@
         hideProfileUrl: false,
         enableAdvancedSearch: false
       },
+      fontFamily: "system",
       useSidePanel: false
     };
   }
@@ -98,6 +99,7 @@
       background: normalizeBackground(source.background),
       generator: normalizeGenerator(source.generator),
       features: normalizeFeatures(source.features),
+      fontFamily: typeof source.fontFamily === "string" ? source.fontFamily : defaults.fontFamily,
       useSidePanel: typeof source.useSidePanel === "boolean" ? source.useSidePanel : false
     };
   }

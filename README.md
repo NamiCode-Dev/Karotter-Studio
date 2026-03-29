@@ -1,4 +1,4 @@
-# 🌊 Karotter Studio
+# 🌊 Karotter Studio (v1.2.0)
 
 > Karotter を、もっと自分らしく、もっと快適に。
 

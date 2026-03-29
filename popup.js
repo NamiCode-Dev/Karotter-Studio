@@ -46,6 +46,8 @@
     hideQrCode: document.getElementById("hideQrCode"),
     hideProfileUrl: document.getElementById("hideProfileUrl"),
     enableAdvancedSearch: document.getElementById("enableAdvancedSearch"),
+    fontSelect: document.getElementById("fontSelect"),
+    fontSegmentedControl: document.getElementById("fontSegmentedControl"),
     tabBtns: document.querySelectorAll(".tab-btn"),
     tabPanes: document.querySelectorAll(".tab-pane")
   };
@@ -87,6 +89,24 @@
     elements.saturationValue.textContent = (generator.saturationShift > 0 ? "+" : "") + generator.saturationShift;
     elements.lightnessRange.value = String(generator.lightnessShift);
     elements.lightnessValue.textContent = (generator.lightnessShift > 0 ? "+" : "") + generator.lightnessShift;
+  }
+
+  function syncFontUi(fontFamily) {
+    if (!elements.fontSegmentedControl) return;
+    const segments = elements.fontSegmentedControl.querySelectorAll(".segment");
+    const indicator = elements.fontSegmentedControl.querySelector(".segment-indicator");
+    
+    segments.forEach((seg) => {
+      if (seg.dataset.value === fontFamily) {
+        seg.classList.add("active");
+        indicator.style.width = seg.offsetWidth + "px";
+        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+      } else {
+        seg.classList.remove("active");
+      }
+    });
+    
+    elements.fontSelect.value = fontFamily;
   }
 
   function getPreviewBackground(background) {
@@ -199,6 +219,7 @@
     elements.toggleHelp.textContent = settings.enabled ? "Active" : "Disabled";
 
     syncGeneratorUi(settings.generator);
+    syncFontUi(settings.fontFamily || "system");
     renderWithPreview(settings.theme, getPreviewBackground(settings.background));
     renderBackgroundUi();
     renderFeaturesUi();
@@ -350,6 +371,33 @@
     });
     
     scheduleThemeAutoApply();
+  });
+
+  // Font Segmented Control logic
+  elements.fontSegmentedControl.addEventListener("click", function (e) {
+    const btn = e.target.closest(".segment");
+    if (!btn) return;
+    
+    const value = btn.dataset.value;
+    elements.fontSelect.value = value;
+    
+    const segments = elements.fontSegmentedControl.querySelectorAll(".segment");
+    const indicator = elements.fontSegmentedControl.querySelector(".segment-indicator");
+    
+    segments.forEach((seg) => {
+      if (seg === btn) {
+        seg.classList.add("active");
+        indicator.style.width = seg.offsetWidth + "px";
+        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+      } else {
+        seg.classList.remove("active");
+      }
+    });
+    
+    persist(
+      Object.assign({}, settings, { fontFamily: value }),
+      "フォントを変更しました。"
+    );
   });
 
   elements.useSidePanel.addEventListener("change", function () {

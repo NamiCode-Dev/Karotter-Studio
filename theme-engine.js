@@ -115,6 +115,19 @@
     "accent-soft": 0.18,
     "surface-shadow": 0.16
   };
+  
+  const fontMap = {
+    "mushin": {
+      name: "無心",
+      file: "mushin.otf",
+      format: "opentype"
+    },
+    "timemachine-wa": {
+      name: "タイム",
+      file: "timemachine-wa.ttf",
+      format: "truetype"
+    }
+  };
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -509,6 +522,7 @@
 
   function buildUtilityOverrideCss() {
     return [
+      "html, body, #root { font-family: var(--app-font, inherit) !important; }",
       ".bg-blue-50{background-color:var(--accent-soft)!important;}",
       ".bg-blue-600{background-color:var(--accent)!important;border-color:var(--accent)!important;}",
       ".border-blue-600{--tw-border-opacity:1!important;border-color:var(--accent)!important;}",
@@ -517,8 +531,27 @@
       ".focus\\:border-blue-500:focus{border-color:var(--accent)!important;}",
       ".focus\\:ring-blue-500:focus{--tw-ring-color: var(--accent-soft)!important;}",
       ".bg-white\\/80{background-color:var(--surface-card)!important;backdrop-filter:blur(8px)!important;}",
-      "select, option, optgroup { background-color: var(--surface-card) !important; color: var(--text-primary) !important; border-color: var(--border-soft) !important; }"
+      "select, option, optgroup { background-color: var(--surface-card) !important; color: var(--text-primary) !important; border-color: var(--border-soft) !important; }",
+      "div.min-h-screen.px-3.py-4.md\\:px-5.md\\:py-6 { background: var(--app-bg) !important; color: var(--text-primary) !important; --board-panel: var(--surface-card) !important; --board-panel-soft: var(--surface-soft) !important; --board-border: var(--border-soft) !important; --board-highlight: var(--accent) !important; --board-highlight-text: var(--app-bg) !important; --board-muted: var(--text-muted) !important; }"
     ].join("\n");
+  }
+
+  function buildFontFaceCss() {
+    return Object.keys(fontMap).map(function (key) {
+      const font = fontMap[key];
+      const url = typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL
+        ? chrome.runtime.getURL("font/" + font.file)
+        : "font/" + font.file;
+      return [
+        "@font-face {",
+        "  font-family: '" + key + "';",
+        "  src: url('" + url + "') format('" + font.format + "');",
+        "  font-weight: normal;",
+        "  font-style: normal;",
+        "  font-display: swap;",
+        "}"
+      ].join("\n");
+    }).join("\n");
   }
 
   function buildBackgroundImageCss(background) {
@@ -563,11 +596,20 @@
     const source = settings && typeof settings === "object" ? settings : {};
     const features = source.features || {};
     const background = source.background && typeof source.background === "object" ? source.background : null;
+    const fontFamily = source.fontFamily || "system";
     const appliedTheme = buildBackgroundTheme(source.theme, background);
 
-    const parts = [];
+    const parts = [buildFontFaceCss()];
+    
+    let rootVars = buildCssOutput(appliedTheme, ":root");
+    if (fontFamily !== "system" && fontMap[fontFamily]) {
+      rootVars = rootVars.replace("}", "  --app-font: '" + fontFamily + "', sans-serif !important;\n}");
+    } else {
+      rootVars = rootVars.replace("}", "  --app-font: inherit !important;\n}");
+    }
+    
     if (features.customTheme !== false) {
-      parts.push(buildCssOutput(appliedTheme, ":root"));
+      parts.push(rootVars);
       parts.push(buildUtilityOverrideCss());
     }
     parts.push(buildBackgroundImageCss(background));
@@ -614,8 +656,10 @@
     buildBackgroundTheme: buildBackgroundTheme,
     buildCssOutput: buildCssOutput,
     buildUtilityOverrideCss: buildUtilityOverrideCss,
+    buildFontFaceCss: buildFontFaceCss,
     buildBackgroundImageCss: buildBackgroundImageCss,
     buildAppliedCss: buildAppliedCss,
+    fontMap: fontMap,
     parseCssText: parseCssText
   };
 })(typeof window !== "undefined" ? window : self);
