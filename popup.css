@@ -691,6 +691,243 @@ input[type="range"]::-webkit-slider-thumb {
   }
 }
 
+/* Font Source Panels */
+.font-source-panel {
+  margin-top: 16px;
+  animation: tabAppear 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Font Area */
+.custom-font-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-font-status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.custom-font-icon {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.custom-font-status.has-font .custom-font-icon {
+  color: var(--accent);
+}
+
+.custom-font-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.custom-font-name {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-font-hint {
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+/* Google Fonts Area */
+.google-fonts-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.google-fonts-notice {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(255, 171, 0, 0.06);
+  border: 1px solid rgba(255, 171, 0, 0.18);
+  border-radius: var(--radius-sm);
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: rgba(255, 200, 60, 0.85);
+}
+
+.google-fonts-notice svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: rgba(255, 171, 0, 0.7);
+}
+
+.google-fonts-selected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(29, 155, 240, 0.25);
+  border-radius: var(--radius-sm);
+  animation: tabAppear 0.2s ease;
+}
+
+.google-fonts-selected-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.google-fonts-selected-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.google-fonts-selected-clear {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.google-fonts-selected-clear:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+
+.google-fonts-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s;
+}
+
+.google-fonts-search:focus-within {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.google-fonts-search svg {
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.google-fonts-search input {
+  flex: 1;
+  border: none !important;
+  background: transparent !important;
+  padding: 10px 0 !important;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+}
+
+.google-fonts-list {
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.google-fonts-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.google-fonts-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.google-fonts-list::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 99px;
+}
+
+.google-fonts-loading {
+  padding: 20px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.gfont-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-bottom: 1px solid var(--border);
+}
+
+.gfont-item:last-child {
+  border-bottom: none;
+}
+
+.gfont-item:hover {
+  background: var(--surface-hover);
+}
+
+.gfont-item.selected {
+  background: var(--accent-soft);
+}
+
+.gfont-item-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.gfont-item.selected .gfont-item-name {
+  color: var(--accent);
+}
+
+.gfont-item-cat {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.gfont-item-check {
+  display: none;
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.gfont-item.selected .gfont-item-check {
+  display: block;
+}
+
 @media (max-width: 320px) {
 
   .hero-metrics,

@@ -27,7 +27,7 @@
     swatches: document.getElementById("swatches"),
     resetBtn: document.getElementById("resetBtn"),
     openSiteBtn: document.getElementById("openSiteBtn"),
-    // New features
+    // Features
     hideReactions: document.getElementById("hideReactions"),
     customTheme: document.getElementById("customTheme"),
     hideViewCount: document.getElementById("hideViewCount"),
@@ -46,14 +46,34 @@
     hideQrCode: document.getElementById("hideQrCode"),
     hideProfileUrl: document.getElementById("hideProfileUrl"),
     enableAdvancedSearch: document.getElementById("enableAdvancedSearch"),
+    // Font - bundled
     fontSelect: document.getElementById("fontSelect"),
     fontSegmentedControl: document.getElementById("fontSegmentedControl"),
+    // Font - source control
+    fontSourceControl: document.getElementById("fontSourceControl"),
+    fontSourceSystem: document.getElementById("fontSourceSystem"),
+    fontSourceCustom: document.getElementById("fontSourceCustom"),
+    fontSourceGoogle: document.getElementById("fontSourceGoogle"),
+    // Font - custom upload
+    customFontInput: document.getElementById("customFontInput"),
+    customFontPickBtn: document.getElementById("customFontPickBtn"),
+    customFontClearBtn: document.getElementById("customFontClearBtn"),
+    customFontStatus: document.getElementById("customFontStatus"),
+    customFontName: document.getElementById("customFontName"),
+    // Font - Google Fonts
+    googleFontSearch: document.getElementById("googleFontSearch"),
+    googleFontsList: document.getElementById("googleFontsList"),
+    googleFontSelected: document.getElementById("googleFontSelected"),
+    googleFontSelectedName: document.getElementById("googleFontSelectedName"),
+    googleFontClearBtn: document.getElementById("googleFontClearBtn"),
+    // Tabs
     tabBtns: document.querySelectorAll(".tab-btn"),
     tabPanes: document.querySelectorAll(".tab-pane")
   };
 
   let settings = null;
   let autoApplyTimer = null;
+  let googleFontsData = null;
 
   function clearAutoApplyTimer() {
     if (autoApplyTimer) {
@@ -107,6 +127,62 @@
     });
     
     elements.fontSelect.value = fontFamily;
+  }
+
+  function syncFontSourceUi(fontSource) {
+    if (!elements.fontSourceControl) return;
+    const segments = elements.fontSourceControl.querySelectorAll(".segment");
+    const indicator = elements.fontSourceControl.querySelector(".segment-indicator");
+    
+    segments.forEach((seg) => {
+      if (seg.dataset.value === fontSource) {
+        seg.classList.add("active");
+        indicator.style.width = seg.offsetWidth + "px";
+        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+      } else {
+        seg.classList.remove("active");
+      }
+    });
+
+    // Show/hide source panels
+    elements.fontSourceSystem.style.display = fontSource === "system" ? "" : "none";
+    elements.fontSourceCustom.style.display = fontSource === "custom" ? "" : "none";
+    elements.fontSourceGoogle.style.display = fontSource === "google" ? "" : "none";
+  }
+
+  function renderCustomFontUi() {
+    const hasFont = Boolean(settings.customFont && settings.customFont.dataUrl && settings.customFont.name);
+    elements.customFontClearBtn.disabled = !hasFont;
+    
+    if (hasFont) {
+      elements.customFontName.textContent = settings.customFont.name;
+      elements.customFontStatus.classList.add("has-font");
+    } else {
+      elements.customFontName.textContent = "フォント未設定";
+      elements.customFontStatus.classList.remove("has-font");
+    }
+  }
+
+  function renderGoogleFontUi() {
+    const hasFont = Boolean(settings.googleFont && settings.googleFont.family);
+    
+    if (hasFont) {
+      elements.googleFontSelected.style.display = "flex";
+      elements.googleFontSelectedName.textContent = settings.googleFont.family;
+    } else {
+      elements.googleFontSelected.style.display = "none";
+      elements.googleFontSelectedName.textContent = "";
+    }
+
+    // Update selected state in list
+    const items = elements.googleFontsList.querySelectorAll(".gfont-item");
+    items.forEach(item => {
+      if (item.dataset.family === (settings.googleFont.family || "")) {
+        item.classList.add("selected");
+      } else {
+        item.classList.remove("selected");
+      }
+    });
   }
 
   function getPreviewBackground(background) {
@@ -220,6 +296,9 @@
 
     syncGeneratorUi(settings.generator);
     syncFontUi(settings.fontFamily || "system");
+    syncFontSourceUi(settings.fontSource || "system");
+    renderCustomFontUi();
+    renderGoogleFontUi();
     renderWithPreview(settings.theme, getPreviewBackground(settings.background));
     renderBackgroundUi();
     renderFeaturesUi();
@@ -373,7 +452,7 @@
     scheduleThemeAutoApply();
   });
 
-  // Font Segmented Control logic
+  // Font Segmented Control logic (bundled fonts)
   elements.fontSegmentedControl.addEventListener("click", function (e) {
     const btn = e.target.closest(".segment");
     if (!btn) return;
@@ -397,6 +476,185 @@
     persist(
       Object.assign({}, settings, { fontFamily: value }),
       "フォントを変更しました。"
+    );
+  });
+
+  // Font Source Control logic
+  elements.fontSourceControl.addEventListener("click", function (e) {
+    const btn = e.target.closest(".segment");
+    if (!btn) return;
+    
+    const value = btn.dataset.value;
+    
+    const segments = elements.fontSourceControl.querySelectorAll(".segment");
+    const indicator = elements.fontSourceControl.querySelector(".segment-indicator");
+    
+    segments.forEach((seg) => {
+      if (seg === btn) {
+        seg.classList.add("active");
+        indicator.style.width = seg.offsetWidth + "px";
+        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+      } else {
+        seg.classList.remove("active");
+      }
+    });
+
+    // Show/hide panels
+    elements.fontSourceSystem.style.display = value === "system" ? "" : "none";
+    elements.fontSourceCustom.style.display = value === "custom" ? "" : "none";
+    elements.fontSourceGoogle.style.display = value === "google" ? "" : "none";
+
+    // Load Google Fonts list if switching to google and not yet loaded
+    if (value === "google" && !googleFontsData) {
+      loadGoogleFontsList();
+    }
+    
+    persist(
+      Object.assign({}, settings, { fontSource: value }),
+      "フォントソースを変更しました。"
+    );
+  });
+
+  // Custom Font Upload
+  elements.customFontPickBtn.addEventListener("click", () => elements.customFontInput.click());
+
+  elements.customFontInput.addEventListener("change", async function (event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const ext = file.name.split(".").pop().toLowerCase();
+    const formatMap = {
+      "ttf": "truetype",
+      "otf": "opentype",
+      "woff": "woff",
+      "woff2": "woff2"
+    };
+    const format = formatMap[ext];
+    if (!format) {
+      alert("未対応のフォント形式です。TTF, OTF, WOFF, WOFF2 のいずれかを選択してください。");
+      return;
+    }
+
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      const fontName = file.name.replace(/\.[^.]+$/, "");
+      await persist(
+        Object.assign({}, settings, {
+          fontSource: "custom",
+          customFont: {
+            name: fontName,
+            dataUrl: dataUrl,
+            format: format
+          }
+        }),
+        "カスタムフォントを適用しました。"
+      );
+    } catch (error) {
+      console.error("Font upload failed:", error);
+      alert("フォントの読み込みに失敗しました。");
+    } finally {
+      elements.customFontInput.value = "";
+    }
+  });
+
+  elements.customFontClearBtn.addEventListener("click", function () {
+    persist(
+      Object.assign({}, settings, {
+        fontSource: "custom",
+        customFont: { name: "", dataUrl: "", format: "" }
+      }),
+      "カスタムフォントを削除しました。"
+    );
+  });
+
+  // Google Fonts
+  function loadGoogleFontsList() {
+    fetch(chrome.runtime.getURL("google-fonts-jp.json"))
+      .then(res => res.json())
+      .then(data => {
+        // Remove duplicates by family name
+        const seen = new Set();
+        googleFontsData = data.filter(f => {
+          if (seen.has(f.family)) return false;
+          seen.add(f.family);
+          return true;
+        });
+        renderGoogleFontList(googleFontsData);
+      })
+      .catch(err => {
+        console.error("Failed to load Google Fonts list:", err);
+        elements.googleFontsList.innerHTML = '<div class="google-fonts-loading">読み込み失敗</div>';
+      });
+  }
+
+  function renderGoogleFontList(fonts) {
+    const CHECK_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    
+    elements.googleFontsList.innerHTML = "";
+    
+    if (fonts.length === 0) {
+      elements.googleFontsList.innerHTML = '<div class="google-fonts-loading">該当するフォントがありません</div>';
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    fonts.forEach(font => {
+      const item = document.createElement("div");
+      item.className = "gfont-item";
+      item.dataset.family = font.family;
+      if (settings.googleFont && settings.googleFont.family === font.family) {
+        item.classList.add("selected");
+      }
+      
+      item.innerHTML = '<span class="gfont-item-name">' + (font.label || font.family) + '</span>' +
+        '<span class="gfont-item-cat">' + font.category + '</span>' +
+        '<span class="gfont-item-check">' + CHECK_SVG + '</span>';
+      
+      item.addEventListener("click", function () {
+        // Deselect previous
+        const prev = elements.googleFontsList.querySelector(".gfont-item.selected");
+        if (prev) prev.classList.remove("selected");
+        item.classList.add("selected");
+
+        persist(
+          Object.assign({}, settings, {
+            fontSource: "google",
+            googleFont: {
+              family: font.family,
+              category: font.category
+            }
+          }),
+          "Google Font を適用しました。"
+        );
+      });
+      
+      fragment.appendChild(item);
+    });
+    elements.googleFontsList.appendChild(fragment);
+  }
+
+  elements.googleFontSearch.addEventListener("input", function () {
+    if (!googleFontsData) return;
+    const query = elements.googleFontSearch.value.trim().toLowerCase();
+    if (!query) {
+      renderGoogleFontList(googleFontsData);
+      return;
+    }
+    const filtered = googleFontsData.filter(f => {
+      return f.family.toLowerCase().includes(query) ||
+        (f.label && f.label.toLowerCase().includes(query)) ||
+        f.category.toLowerCase().includes(query);
+    });
+    renderGoogleFontList(filtered);
+  });
+
+  elements.googleFontClearBtn.addEventListener("click", function () {
+    persist(
+      Object.assign({}, settings, {
+        fontSource: "google",
+        googleFont: { family: "", category: "" }
+      }),
+      "Google Font の選択を解除しました。"
     );
   });
 
@@ -569,5 +827,9 @@
   storage.loadSettings().then(function (loadedSettings) {
     settings = loadedSettings;
     render();
+    // Pre-load Google Fonts list if source is google
+    if (settings.fontSource === "google") {
+      loadGoogleFontsList();
+    }
   });
 }());

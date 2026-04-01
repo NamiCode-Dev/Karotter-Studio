@@ -592,21 +592,72 @@
     ].join("\n");
   }
 
+  function buildCustomFontFaceCss(customFont) {
+    if (!customFont || !customFont.dataUrl || !customFont.name) {
+      return "";
+    }
+    return [
+      "@font-face {",
+      "  font-family: 'karotter-custom-font';",
+      "  src: url('" + customFont.dataUrl + "') format('" + (customFont.format || 'truetype') + "');",
+      "  font-weight: normal;",
+      "  font-style: normal;",
+      "  font-display: swap;",
+      "}"
+    ].join("\n");
+  }
+
+  function buildGoogleFontImportCss(googleFont) {
+    if (!googleFont || !googleFont.family) {
+      return "";
+    }
+    const encodedFamily = encodeURIComponent(googleFont.family);
+    return "@import url('https://fonts.googleapis.com/css2?family=" + encodedFamily + "&display=swap');";
+  }
+
   function buildAppliedCss(settings) {
     const source = settings && typeof settings === "object" ? settings : {};
     const features = source.features || {};
     const background = source.background && typeof source.background === "object" ? source.background : null;
     const fontFamily = source.fontFamily || "system";
+    const fontSource = source.fontSource || "system";
+    const customFont = source.customFont || {};
+    const googleFont = source.googleFont || {};
     const appliedTheme = buildBackgroundTheme(source.theme, background);
 
-    const parts = [buildFontFaceCss()];
-    
-    let rootVars = buildCssOutput(appliedTheme, ":root");
-    if (fontFamily !== "system" && fontMap[fontFamily]) {
-      rootVars = rootVars.replace("}", "  --app-font: '" + fontFamily + "', sans-serif !important;\n}");
-    } else {
-      rootVars = rootVars.replace("}", "  --app-font: inherit !important;\n}");
+    const parts = [];
+
+    // Google Fonts import must come first (CSS @import rule)
+    if (fontSource === "google" && googleFont.family) {
+      parts.push(buildGoogleFontImportCss(googleFont));
     }
+
+    // Bundled font faces
+    parts.push(buildFontFaceCss());
+
+    // Custom font face
+    if (fontSource === "custom" && customFont.dataUrl) {
+      parts.push(buildCustomFontFaceCss(customFont));
+    }
+
+    let rootVars = buildCssOutput(appliedTheme, ":root");
+
+    // Determine the font-family value based on fontSource
+    let fontFamilyValue = "inherit";
+    if (fontSource === "system") {
+      if (fontFamily !== "system" && fontMap[fontFamily]) {
+        fontFamilyValue = "'" + fontFamily + "', sans-serif";
+      } else {
+        fontFamilyValue = "inherit";
+      }
+    } else if (fontSource === "custom" && customFont.dataUrl && customFont.name) {
+      fontFamilyValue = "'karotter-custom-font', sans-serif";
+    } else if (fontSource === "google" && googleFont.family) {
+      const fallback = googleFont.category || "sans-serif";
+      fontFamilyValue = "'" + googleFont.family + "', " + fallback;
+    }
+
+    rootVars = rootVars.replace("}", "  --app-font: " + fontFamilyValue + " !important;\n}");
     
     if (features.customTheme !== false) {
       parts.push(rootVars);
@@ -657,6 +708,8 @@
     buildCssOutput: buildCssOutput,
     buildUtilityOverrideCss: buildUtilityOverrideCss,
     buildFontFaceCss: buildFontFaceCss,
+    buildCustomFontFaceCss: buildCustomFontFaceCss,
+    buildGoogleFontImportCss: buildGoogleFontImportCss,
     buildBackgroundImageCss: buildBackgroundImageCss,
     buildAppliedCss: buildAppliedCss,
     fontMap: fontMap,

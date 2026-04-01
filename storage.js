@@ -38,6 +38,16 @@
         enableAdvancedSearch: false
       },
       fontFamily: "system",
+      fontSource: "system",
+      customFont: {
+        name: "",
+        dataUrl: "",
+        format: ""
+      },
+      googleFont: {
+        family: "",
+        category: ""
+      },
       useSidePanel: false
     };
   }
@@ -89,9 +99,28 @@
     };
   }
 
+  function normalizeCustomFont(input) {
+    const font = input && typeof input === "object" ? input : {};
+    const validFormats = ["truetype", "opentype", "woff", "woff2"];
+    return {
+      name: typeof font.name === "string" ? font.name : "",
+      dataUrl: typeof font.dataUrl === "string" && /^data:/i.test(font.dataUrl) ? font.dataUrl : "",
+      format: validFormats.includes(font.format) ? font.format : ""
+    };
+  }
+
+  function normalizeGoogleFont(input) {
+    const font = input && typeof input === "object" ? input : {};
+    return {
+      family: typeof font.family === "string" ? font.family : "",
+      category: typeof font.category === "string" ? font.category : ""
+    };
+  }
+
   function normalizeSettings(input) {
     const defaults = getDefaultSettings();
     const source = input && typeof input === "object" ? input : {};
+    const validSources = ["system", "custom", "google"];
     return {
       version: typeof source.version === "number" ? source.version : defaults.version,
       enabled: typeof source.enabled === "boolean" ? source.enabled : defaults.enabled,
@@ -100,6 +129,9 @@
       generator: normalizeGenerator(source.generator),
       features: normalizeFeatures(source.features),
       fontFamily: typeof source.fontFamily === "string" ? source.fontFamily : defaults.fontFamily,
+      fontSource: validSources.includes(source.fontSource) ? source.fontSource : defaults.fontSource,
+      customFont: normalizeCustomFont(source.customFont),
+      googleFont: normalizeGoogleFont(source.googleFont),
       useSidePanel: typeof source.useSidePanel === "boolean" ? source.useSidePanel : false
     };
   }
@@ -135,6 +167,8 @@
     normalizeBackground: normalizeBackground,
     normalizeGenerator: normalizeGenerator,
     normalizeFeatures: normalizeFeatures,
+    normalizeCustomFont: normalizeCustomFont,
+    normalizeGoogleFont: normalizeGoogleFont,
     loadSettings: loadSettings,
     saveSettings: saveSettings,
     updateSettings: updateSettings
