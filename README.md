@@ -1,9 +1,4 @@
-# 🌊 Karotter Studio (v1.5.0)
-
-
-> Karotter を、もっと自分らしく、もっと快適に。
-
-**Karotter Studio** は、[karotter.com](https://karotter.com) およびそのサブドメイン（`apikarotter.karon.jp` 等を含む）のエクスペリエンスを劇的に進化させる Chrome 拡張機能です。強力なテーマエンジンによる自由な外観カスタマイズから、集中力を高める機能拡張まで。あなたのブラウジングを「スタジオ」に変えます。
+**Karotter Studio** は、[karotter.com](https://karotter.com) およびそのサブドメイン（`apikarotter.karon.jp` 等を含む）のエクスペリエンスを劇的に進化させるブラウザ拡張機能（Chrome & Firefox 対応）です。強力なテーマエンジンによる自由な外観カスタマイズから、集中力を高める機能拡張まで。あなたのブラウジングを「スタジオ」に変えます。
 
 ---
 
@@ -30,8 +25,7 @@
 
 ---
 
-## 🆕 アップデート情報 (v1.5.0)
-
+- **Firefox 版の公式サポート**: Firefox 向けに Manifest V3 で移植。サイドパネル（サイドバー）標準対応により、よりシームレスな操作性を実現。
 - **UI 設定の整理**: 「返信を非表示」設定を「UI の簡素化」セクションへ移動し、より直感的にアクセスできるよう改善。
 - **文言のブラッシュアップ**: 設定画面の各項目の説明文をよりわかりやすく、適切な表現に修正。
 - **バージョンアップ**: 内部バージョンおよび UI 表示を 1.5.0 に更新。
@@ -40,16 +34,25 @@
 
 ## 🚀 導入方法
 
-現在は開発者モードでの提供となります。
+[GitHub Releases](https://github.com/NamiCode-Dev/Karotter-Studio/releases) から最新の ZIP ファイルをダウンロードして解凍してください。
 
-1. 本リポジトリをクローンまたは ZIP でダウンロードして解凍します。
-2. Google Chrome で `chrome://extensions` を開きます。
-3. 右上の「**デベロッパー モード**」をオンにします。
-4. 「**パッケージ化されていない拡張機能を読み込む**」をクリックします。
-5. 解凍したフォルダを選択するとインストールが完了します。
+### Google Chrome
+1. Chrome で `chrome://extensions` を開きます。
+2. 右上の「**デベロッパー モード**」をオンにします。
+3. 「**パッケージ化されていない拡張機能を読み込む**」をクリックします。
+4. 解凍したフォルダのルート（`manifest.json` がある場所）を選択してください。
 
 > [!TIP]
 > Chrome のサイドパネル機能に対応しています。拡張機能アイコンを右クリックして「サイドパネルで開く」を選択すると、タイムラインを見ながらリアルタイムで設定を変更できます。
+
+### Firefox
+1. Firefox で `about:debugging#/runtime/this-firefox` を開きます。
+2. 「**一時的なアドオンを読み込む...**」をクリックします。
+3. 解凍したフォルダ内の **`firefox/manifest.json`** を選択してください。
+
+> [!NOTE]
+> Firefox 版は標準でサイドパネル（サイドバー）で開くように設定されています。ツールバーのアイコンをクリックするだけで、サイドバーに設定画面が表示されます。
+
 
 ---
 
@@ -57,12 +60,14 @@
 
 ```text
 .
-├── manifest.json      # 拡張機能の定義 (Manifest V3)
+├── manifest.json      # Chrome 用の定義 (Manifest V3)
+├── firefox/           # Firefox 用のソースコード一式
+│   └── manifest.json  # Firefox 用の定義 (Sidebar 特化)
 ├── popup.html/js/css  # 設定画面の UI とロジック
 ├── content.js         # Karotter への機能注入
 ├── theme-engine.js    # 配色生成コアロジック
 ├── storage.js         # 設定の永続化処理
-└── background.js      # バックグラウンド処理・サイドパネル制御
+└── background.js      # バックグラウンド処理
 ```
 
 ---
