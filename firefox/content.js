@@ -1320,18 +1320,16 @@
 
   function injectCustomFont(customFont) {
     if (!customFont || !customFont.dataUrl) return;
-    const fontName = 'karotter-custom-font';
-    const font = new FontFace(fontName, `url(${customFont.dataUrl})`);
-    font.load().then(f => {
-      document.fonts.forEach(existing => {
-        if (existing.family === fontName) {
-          document.fonts.delete(existing);
-        }
-      });
-      document.fonts.add(f);
-      console.log("[Karotter] Custom font injected via FontFace API");
-    }).catch(err => {
-      console.error("[Karotter] Custom font injection failed:", err);
+    const css = engine.buildCustomFontFaceCss(customFont);
+    chrome.runtime.sendMessage({
+      action: "karotter-inject-font-css",
+      css: css
+    }, (res) => {
+      if (res && res.success) {
+        console.log("[Karotter] Font CSS injected via background (User Origin)");
+      } else {
+        console.error("[Karotter] Font CSS injection failed:", res ? res.error : "Unknown error");
+      }
     });
   }
 

@@ -41,7 +41,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
 });
 
-// Handle download requests from content script
+// Handle requests from content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "download_image") {
     chrome.downloads.download({
@@ -57,5 +57,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
     });
     return true; // Keep message channel open for async sendResponse
+  }
+
+  if (message.action === "karotter-inject-font-css") {
+    // Firefox specific: use browser.tabs.insertCSS with cssOrigin: 'user' to bypass CSP
+    if (typeof browser !== 'undefined' && browser.tabs && browser.tabs.insertCSS) {
+      browser.tabs.insertCSS(sender.tab.id, {
+        code: message.css,
+        cssOrigin: 'user'
+      }).then(() => {
+        sendResponse({ success: true });
+      }).catch(err => {
+        console.error("Font injection failed:", err);
+        sendResponse({ success: false, error: err.message });
+      });
+      return true;
+    }
   }
 });
