@@ -1,5 +1,6 @@
 # 🌊 Karotter Studio (v1.3.0)
 
+
 > Karotter を、もっと自分らしく、もっと快適に。
 
 **Karotter Studio** は、[karotter.com](https://karotter.com) のエクスペリエンスを劇的に進化させる Chrome 拡張機能です。強力なテーマエンジンによる自由な外観カスタマイズから、集中力を高める機能拡張まで。あなたのブラウジングを「スタジオ」に変えます。
@@ -66,8 +67,16 @@
 
 ---
 
-## 📜 ライセンス
+---
 
-このプロジェクトは [MIT ライセンス](LICENSE) の下で公開されています。
+## ⚖️ サードパーティ・ライセンス / Credits
+
+本拡張機能では、以下のオープンソースソフトウェアおよび資産を使用しています。開発者の皆様に感謝いたします。
+
+- **[Lucide Icons](https://lucide.dev/)**: [ISC License](https://github.com/lucide-icons/lucide/blob/main/LICENSE) - UIアイコンとして使用。
+
+---
 
 Developed with ❤️ for the Karotter Community.
+
+---
