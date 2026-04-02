@@ -35,7 +35,11 @@
     "default_panel": "popup.html"
   },
   "background": {
-    "service_worker": "background.js"
+    "scripts": [
+      "theme-engine.js",
+      "storage.js",
+      "background.js"
+    ]
   },
   "content_scripts": [
     {

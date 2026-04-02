@@ -1,5 +1,5 @@
 // Import storage and engine for normalization if needed
-importScripts("theme-engine.js", "storage.js");
+// importScripts("theme-engine.js", "storage.js");
 
 const storage = self.KarotterThemeStorage;
 
