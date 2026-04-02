@@ -35,6 +35,8 @@
     hideOperatorMark: document.getElementById("hideOperatorMark"),
     hideVerifiedGroupMark: document.getElementById("hideVerifiedGroupMark"),
     hideVerifiedMark: document.getElementById("hideVerifiedMark"),
+    collapseSidebarSections: document.getElementById("collapseSidebarSections"),
+    collapseSidebarInitially: document.getElementById("collapseSidebarInitially"),
     collapseSidebarInitially: document.getElementById("collapseSidebarInitially"),
     hideSpoilers: document.getElementById("hideSpoilers"),
     spoilerKeywords: document.getElementById("spoilerKeywords"),
@@ -54,6 +56,8 @@
     // Font - source control
     fontSourceControl: document.getElementById("fontSourceControl"),
     fontSourceSystem: document.getElementById("fontSourceSystem"),
+    fontSourceGoogle: document.getElementById("fontSourceGoogle"),
+
     // Font - Google Fonts
     googleFontSearch: document.getElementById("googleFontSearch"),
     googleFontsList: document.getElementById("googleFontsList"),
@@ -143,6 +147,11 @@
     // Show/hide source panels
     elements.fontSourceSystem.style.display = fontSource === "system" ? "" : "none";
     elements.fontSourceGoogle.style.display = fontSource === "google" ? "" : "none";
+
+    // Load Google Fonts list if needed
+    if (fontSource === "google" && !googleFontsData) {
+      loadGoogleFontsList();
+    }
   }
 
 
@@ -280,6 +289,7 @@
     elements.hideOperatorMark.checked = settings.features.hideOperatorMark;
     elements.hideVerifiedGroupMark.checked = settings.features.hideVerifiedGroupMark;
     elements.hideVerifiedMark.checked = settings.features.hideVerifiedMark;
+    elements.collapseSidebarSections.checked = settings.features.collapseSidebarSections;
     elements.collapseSidebarInitially.checked = settings.features.collapseSidebarInitially;
     elements.hideSpoilers.checked = settings.features.hideSpoilers;
     elements.spoilerKeywords.value = settings.features.spoilerKeywords;
@@ -316,6 +326,7 @@
     elements.toggleHelp.textContent = settings.enabled ? "Active" : "Disabled";
 
     syncGeneratorUi(settings.generator);
+    syncFontUi(settings.fontFamily || "system");
     syncFontSourceUi(settings.fontSource || "system");
     renderGoogleFontUi();
     syncAppThemeUi(settings.appTheme || "system");
@@ -513,7 +524,6 @@
 
     // Show/hide panels
     elements.fontSourceSystem.style.display = value === "system" ? "" : "none";
-    elements.fontSourceCustom.style.display = value === "custom" ? "" : "none";
     elements.fontSourceGoogle.style.display = value === "google" ? "" : "none";
 
     // Load Google Fonts list if switching to google and not yet loaded
@@ -531,9 +541,18 @@
 
   // Google Fonts
   function loadGoogleFontsList() {
-    fetch(chrome.runtime.getURL("google-fonts-jp.json"))
-      .then(res => res.json())
+    console.log("[Karotter] Loading Google Fonts list...");
+    const url = chrome.runtime.getURL("google-fonts-jp.json");
+    console.log("[Karotter] Fetching URL:", url);
+
+    fetch(url)
+      .then(res => {
+        console.log("[Karotter] Fetch response status:", res.status, res.statusText);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
       .then(data => {
+        console.log("[Karotter] JSON loaded successfully, items:", data.length);
         // Remove duplicates by family name
         const seen = new Set();
         googleFontsData = data.filter(f => {
@@ -544,8 +563,8 @@
         renderGoogleFontList(googleFontsData);
       })
       .catch(err => {
-        console.error("Failed to load Google Fonts list:", err);
-        elements.googleFontsList.innerHTML = '<div class="google-fonts-loading">読み込み失敗</div>';
+        console.error("[Karotter] Failed to load Google Fonts list:", err);
+        elements.googleFontsList.innerHTML = `<div class="google-fonts-loading">読み込み失敗: ${err.message}</div>`;
       });
   }
 
@@ -634,8 +653,6 @@
       "カラーテーマを変更しました。"
     );
   });
-
-
 
   elements.saturationRange.addEventListener("input", function () {
     const val = Number(elements.saturationRange.value);

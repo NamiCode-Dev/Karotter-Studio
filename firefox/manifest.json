@@ -13,6 +13,7 @@
   "permissions": [
     "storage",
     "unlimitedStorage",
+    "sidebarAction",
     "downloads"
   ],
   "host_permissions": [
@@ -26,8 +27,7 @@
     "https://*.apikarotter.karon.jp/*"
   ],
   "action": {
-    "default_title": "Karotter Studio",
-    "default_popup": "popup.html"
+    "default_title": "Karotter Studio"
   },
   "sidebar_action": {
     "default_title": "Karotter Studio",
@@ -64,7 +64,8 @@
     {
       "resources": [
         "font/*.otf",
-        "font/*.ttf"
+        "font/*.ttf",
+        "google-fonts-jp.json"
       ],
       "matches": [
         "https://karotter.com/*",
