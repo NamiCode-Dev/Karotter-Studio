@@ -26,6 +26,7 @@
         hideIdentityMark: false,
         hideOperatorMark: false,
         hideVerifiedGroupMark: false,
+        hideVerifiedMark: false,
         enhanceVideoPlayer: false,
         collapseSidebarSections: false,
         collapseSidebarInitially: false,
@@ -35,7 +36,9 @@
         imageDownload: false,
         hideQrCode: false,
         hideProfileUrl: false,
-        enableAdvancedSearch: false
+        enableAdvancedSearch: false,
+        showBoardsLink: false,
+        enableVBotCommands: false
       },
       fontFamily: "system",
       fontSource: "system",
@@ -48,7 +51,8 @@
         family: "",
         category: ""
       },
-      useSidePanel: false
+      useSidePanel: false,
+      appTheme: "system"
     };
   }
 
@@ -78,24 +82,27 @@
   }
 
   function normalizeFeatures(input) {
-    const features = input && typeof input === "object" ? input : {};
+    const f = input && typeof input === "object" ? input : {};
     return {
-      customTheme: typeof features.customTheme === "boolean" ? features.customTheme : true,
-      hideReactions: Boolean(features.hideReactions),
-      hideViewCount: Boolean(features.hideViewCount),
-      hideIdentityMark: Boolean(features.hideIdentityMark),
-      hideOperatorMark: Boolean(features.hideOperatorMark),
-      hideVerifiedGroupMark: Boolean(features.hideVerifiedGroupMark),
-      enhanceVideoPlayer: Boolean(features.enhanceVideoPlayer),
-      collapseSidebarSections: Boolean(features.collapseSidebarSections),
-      collapseSidebarInitially: Boolean(features.collapseSidebarInitially),
-      hideSpoilers: Boolean(features.hideSpoilers),
-      spoilerKeywords: typeof features.spoilerKeywords === "string" ? features.spoilerKeywords : "",
-      autoExpandMore: Boolean(features.autoExpandMore),
-      imageDownload: Boolean(features.imageDownload),
-      hideQrCode: Boolean(features.hideQrCode),
-      hideProfileUrl: Boolean(features.hideProfileUrl),
-      enableAdvancedSearch: Boolean(features.enableAdvancedSearch)
+      customTheme: typeof f.customTheme === "boolean" ? f.customTheme : true,
+      hideReactions: Boolean(f.hideReactions),
+      hideViewCount: Boolean(f.hideViewCount),
+      hideIdentityMark: Boolean(f.hideIdentityMark),
+      hideOperatorMark: Boolean(f.hideOperatorMark),
+      hideVerifiedGroupMark: Boolean(f.hideVerifiedGroupMark),
+      hideVerifiedMark: Boolean(f.hideVerifiedMark),
+      enhanceVideoPlayer: Boolean(f.enhanceVideoPlayer),
+      collapseSidebarSections: Boolean(f.collapseSidebarSections),
+      collapseSidebarInitially: Boolean(f.collapseSidebarInitially),
+      hideSpoilers: Boolean(f.hideSpoilers),
+      spoilerKeywords: typeof f.spoilerKeywords === "string" ? f.spoilerKeywords : "",
+      autoExpandMore: Boolean(f.autoExpandMore),
+      imageDownload: !!f.imageDownload,
+      hideQrCode: !!f.hideQrCode,
+      hideProfileUrl: !!f.hideProfileUrl,
+      enableAdvancedSearch: !!f.enableAdvancedSearch,
+      showBoardsLink: !!f.showBoardsLink,
+      enableVBotCommands: !!f.enableVBotCommands
     };
   }
 
@@ -132,7 +139,8 @@
       fontSource: validSources.includes(source.fontSource) ? source.fontSource : defaults.fontSource,
       customFont: normalizeCustomFont(source.customFont),
       googleFont: normalizeGoogleFont(source.googleFont),
-      useSidePanel: typeof source.useSidePanel === "boolean" ? source.useSidePanel : false
+      useSidePanel: typeof source.useSidePanel === "boolean" ? source.useSidePanel : false,
+      appTheme: ["system", "light", "dark"].includes(source.appTheme) ? source.appTheme : "system"
     };
   }
 

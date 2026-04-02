@@ -8,10 +8,75 @@
 }
 
 :root {
+  --bg-base: #f0f3f5;
+  --bg-panel: rgba(255, 255, 255, 0.75);
+  --bg-panel-solid: #ffffff;
+  --bg-subtle: rgba(0, 0, 0, 0.04);
+  --bg-subtle-darker: rgba(0, 0, 0, 0.08);
+  --surface: rgba(0, 0, 0, 0.03);
+  --surface-hover: rgba(0, 0, 0, 0.06);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+  --text: #0f1419;
+  --text-dim: rgba(15, 20, 25, 0.65);
+  --text-faint: rgba(15, 20, 25, 0.4);
+  --accent: #1d9bf0;
+  --accent-soft: rgba(29, 155, 240, 0.1);
+  --accent-glow: rgba(29, 155, 240, 0.3);
+  --success: #00ba7c;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg-base: #05080f;
+    --bg-panel: rgba(13, 17, 28, 0.7);
+    --bg-panel-solid: #0d111c;
+    --bg-subtle: rgba(0, 0, 0, 0.2);
+    --bg-subtle-darker: rgba(0, 0, 0, 0.3);
+    --surface: rgba(255, 255, 255, 0.03);
+    --surface-hover: rgba(255, 255, 255, 0.06);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --text: #ffffff;
+    --text-dim: rgba(255, 255, 255, 0.6);
+    --text-faint: rgba(255, 255, 255, 0.35);
+    /* Accents stay mostly the same or slightly adjusted if needed */
+    --accent-soft: rgba(29, 155, 240, 0.15);
+    --accent-glow: rgba(29, 155, 240, 0.4);
+  }
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg-base: #f0f3f5;
+  --bg-panel: rgba(255, 255, 255, 0.75);
+  --bg-panel-solid: #ffffff;
+  --bg-subtle: rgba(0, 0, 0, 0.04);
+  --bg-subtle-darker: rgba(0, 0, 0, 0.08);
+  --surface: rgba(0, 0, 0, 0.03);
+  --surface-hover: rgba(0, 0, 0, 0.06);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+  --text: #0f1419;
+  --text-dim: rgba(15, 20, 25, 0.65);
+  --text-faint: rgba(15, 20, 25, 0.4);
+  --accent-soft: rgba(29, 155, 240, 0.1);
+  --accent-glow: rgba(29, 155, 240, 0.3);
+}
+
+html[data-theme="dark"] {
   color-scheme: dark;
   --bg-base: #05080f;
   --bg-panel: rgba(13, 17, 28, 0.7);
   --bg-panel-solid: #0d111c;
+  --bg-subtle: rgba(0, 0, 0, 0.2);
+  --bg-subtle-darker: rgba(0, 0, 0, 0.3);
   --surface: rgba(255, 255, 255, 0.03);
   --surface-hover: rgba(255, 255, 255, 0.06);
   --border: rgba(255, 255, 255, 0.08);
@@ -19,14 +84,18 @@
   --text: #ffffff;
   --text-dim: rgba(255, 255, 255, 0.6);
   --text-faint: rgba(255, 255, 255, 0.35);
-  --accent: #1d9bf0;
   --accent-soft: rgba(29, 155, 240, 0.15);
   --accent-glow: rgba(29, 155, 240, 0.4);
-  --success: #00ba7c;
-  --radius-lg: 20px;
-  --radius-md: 14px;
-  --radius-sm: 10px;
-  --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, "Hiragino Sans", "Yu Gothic UI", sans-serif;
+}
+
+html.theme-transition,
+html.theme-transition * {
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-delay: 0s !important;
 }
 
 * {
@@ -100,7 +169,7 @@ h1 {
 /* Action Card / Toggles */
 .action-card {
   padding: 16px;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--bg-subtle);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
 }
@@ -120,6 +189,17 @@ h1 {
 .toggle-title {
   font-weight: 700;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-title svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--accent);
+  opacity: 0.9;
 }
 
 .toggle-status {
@@ -179,7 +259,7 @@ input:checked+.switch-ui:before {
 .tab-nav {
   display: flex;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--bg-subtle);
   padding: 6px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
@@ -318,6 +398,17 @@ input:checked+.switch-ui:before {
   box-shadow: 0 0 15px rgba(255, 171, 0, 0.1);
 }
 
+.beta-badge.mini {
+  padding: 2px 8px;
+  font-size: 9px;
+}
+
+.toggle-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .section-kicker {
   font-size: 10px;
   font-weight: 800;
@@ -330,6 +421,16 @@ h2 {
   font-size: 18px;
   font-weight: 700;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+h2 svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--accent);
 }
 
 .settings-group {
@@ -405,7 +506,7 @@ input[type="text"]:focus {
   position: relative;
   display: flex;
   padding: 4px;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--bg-subtle-darker);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   overflow: hidden;
@@ -500,7 +601,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .swatch {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--bg-subtle);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;

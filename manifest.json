@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Karotter Studio",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Karotterをより快適に。より柔軟にカスタマイズ。",
   "author": "NamiCode",
   "permissions": [
@@ -11,7 +11,10 @@
     "downloads"
   ],
   "host_permissions": [
-    "https://karotter.com/*"
+    "https://karotter.com/*",
+    "https://*.karotter.com/*",
+    "https://karotter.jp/*",
+    "https://*.karotter.jp/*"
   ],
   "action": {
     "default_title": "Karotter Studio",
@@ -26,7 +29,10 @@
   "content_scripts": [
     {
       "matches": [
-        "https://karotter.com/*"
+        "https://karotter.com/*",
+        "https://*.karotter.com/*",
+        "https://karotter.jp/*",
+        "https://*.karotter.jp/*"
       ],
       "js": [
         "theme-engine.js",
@@ -43,7 +49,10 @@
         "font/*.ttf"
       ],
       "matches": [
-        "https://karotter.com/*"
+        "https://karotter.com/*",
+        "https://*.karotter.com/*",
+        "https://karotter.jp/*",
+        "https://*.karotter.jp/*"
       ]
     }
   ]

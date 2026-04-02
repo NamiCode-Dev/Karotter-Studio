@@ -34,6 +34,7 @@
     hideIdentityMark: document.getElementById("hideIdentityMark"),
     hideOperatorMark: document.getElementById("hideOperatorMark"),
     hideVerifiedGroupMark: document.getElementById("hideVerifiedGroupMark"),
+    hideVerifiedMark: document.getElementById("hideVerifiedMark"),
     collapseSidebarSections: document.getElementById("collapseSidebarSections"),
     collapseSidebarInitially: document.getElementById("collapseSidebarInitially"),
     useSidePanel: document.getElementById("useSidePanel"),
@@ -46,6 +47,8 @@
     hideQrCode: document.getElementById("hideQrCode"),
     hideProfileUrl: document.getElementById("hideProfileUrl"),
     enableAdvancedSearch: document.getElementById("enableAdvancedSearch"),
+    showBoardsLink: document.getElementById("showBoardsLink"),
+    enableVBotCommands: document.getElementById("enableVBotCommands"),
     // Font - bundled
     fontSelect: document.getElementById("fontSelect"),
     fontSegmentedControl: document.getElementById("fontSegmentedControl"),
@@ -66,6 +69,8 @@
     googleFontSelected: document.getElementById("googleFontSelected"),
     googleFontSelectedName: document.getElementById("googleFontSelectedName"),
     googleFontClearBtn: document.getElementById("googleFontClearBtn"),
+    // App Theme
+    appThemeControl: document.getElementById("appThemeControl"),
     // Tabs
     tabBtns: document.querySelectorAll(".tab-btn"),
     tabPanes: document.querySelectorAll(".tab-pane")
@@ -185,6 +190,41 @@
     });
   }
 
+  function syncAppThemeUi(theme) {
+    if (!elements.appThemeControl) return;
+    const segments = elements.appThemeControl.querySelectorAll(".segment");
+    const indicator = elements.appThemeControl.querySelector(".segment-indicator");
+    
+    segments.forEach((seg) => {
+      if (seg.dataset.value === theme) {
+        seg.classList.add("active");
+        indicator.style.width = seg.offsetWidth + "px";
+        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+      } else {
+        seg.classList.remove("active");
+      }
+    });
+  }
+
+  function applyAppTheme(theme, skipAnimation = false) {
+    const root = document.documentElement;
+    if (!skipAnimation) {
+      root.classList.add("theme-transition");
+    }
+    
+    if (theme === "system") {
+      root.removeAttribute("data-theme");
+    } else {
+      root.setAttribute("data-theme", theme);
+    }
+    
+    if (!skipAnimation) {
+      setTimeout(() => {
+        root.classList.remove("theme-transition");
+      }, 500);
+    }
+  }
+
   function getPreviewBackground(background) {
     const nextBackground = Object.assign({}, settings.background, background || {});
     if (!settings.enabled) {
@@ -260,6 +300,7 @@
     elements.hideIdentityMark.checked = settings.features.hideIdentityMark;
     elements.hideOperatorMark.checked = settings.features.hideOperatorMark;
     elements.hideVerifiedGroupMark.checked = settings.features.hideVerifiedGroupMark;
+    elements.hideVerifiedMark.checked = settings.features.hideVerifiedMark;
     elements.collapseSidebarSections.checked = settings.features.collapseSidebarSections;
     elements.collapseSidebarInitially.checked = settings.features.collapseSidebarInitially;
     elements.useSidePanel.checked = settings.useSidePanel;
@@ -271,6 +312,8 @@
     elements.hideQrCode.checked = settings.features.hideQrCode;
     elements.hideProfileUrl.checked = settings.features.hideProfileUrl;
     elements.enableAdvancedSearch.checked = settings.features.enableAdvancedSearch;
+    elements.showBoardsLink.checked = settings.features.showBoardsLink;
+    elements.enableVBotCommands.checked = settings.features.enableVBotCommands;
     updateSubOptionStates();
   }
 
@@ -299,6 +342,8 @@
     syncFontSourceUi(settings.fontSource || "system");
     renderCustomFontUi();
     renderGoogleFontUi();
+    syncAppThemeUi(settings.appTheme || "system");
+    applyAppTheme(settings.appTheme || "system", true);
     renderWithPreview(settings.theme, getPreviewBackground(settings.background));
     renderBackgroundUi();
     renderFeaturesUi();
@@ -658,6 +703,21 @@
     );
   });
 
+  // App Theme Control logic
+  elements.appThemeControl.addEventListener("click", function (e) {
+    const btn = e.target.closest(".segment");
+    if (!btn) return;
+    
+    const value = btn.dataset.value;
+    syncAppThemeUi(value);
+    applyAppTheme(value);
+    
+    persist(
+      Object.assign({}, settings, { appTheme: value }),
+      "カラーテーマを変更しました。"
+    );
+  });
+
   elements.useSidePanel.addEventListener("change", function () {
     persist(
       Object.assign({}, settings, { useSidePanel: elements.useSidePanel.checked }),
@@ -706,7 +766,7 @@
   });
 
   // Feature Toggles
-  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch"].forEach(featureKey => {
+  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch", "showBoardsLink", "enableVBotCommands"].forEach(featureKey => {
     const el = elements[featureKey];
     if (el) {
       el.addEventListener("change", function () {
@@ -740,6 +800,17 @@
       const tabId = btn.dataset.tab;
       elements.tabBtns.forEach(b => b.classList.toggle("active", b === btn));
       elements.tabPanes.forEach(p => p.classList.toggle("active", p.id === `${tabId}Tab`));
+
+      // Re-sync UI that depends on layout/measurements when tab becomes visible
+      if (settings) {
+        if (tabId === "appearance") {
+          syncGeneratorUi(settings.generator);
+          syncFontUi(settings.fontFamily || "system");
+          syncFontSourceUi(settings.fontSource || "system");
+        } else if (tabId === "advanced") {
+          syncAppThemeUi(settings.appTheme || "system");
+        }
+      }
     });
   });
 

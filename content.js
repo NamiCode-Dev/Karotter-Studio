@@ -11,8 +11,17 @@
   let socialMenuInterval = null;
   let videoEnhanceInterval = null;
   let advancedSearchInterval = null;
+  let boardsInterval = null;
+  let vbotInterval = null;
+  let vbotCard = null;
+  let vbotAttachedTextarea = null;
+  let vbotSelectedIndex = 0;
+  let vbotFilteredCommands = [];
+
+  // Icons are from Lucide Icons (ISC License: https://lucide.dev/)
   const DOWNLOAD_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
   const ADVANCED_SEARCH_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" width="18" height="18"><g><path d="M10.54 1.75h2.92l1.57 2.36c.11.17.32.25.53.21l2.53-.59 2.17 2.17-.58 2.54c-.05.2.04.41.22.53l2.36 1.57v2.92l-2.36 1.57c-.18.12-.27.33-.22.53l.58 2.54-2.17 2.17-2.53-.59c-.21-.04-.42.04-.53.21l-1.57 2.36h-2.92l-1.57-2.36c-.11-.17-.32-.25-.53-.21l-2.53.59-2.17-2.17.58-2.54c.05-.2-.04-.41-.22-.53l-2.36-1.57v-2.92l2.36-1.57c.18-.12.27-.33.22-.53l-.58-2.54 2.17-2.17 2.53.59c.21.04.42-.04.53-.21l1.57-2.36zm1.71 1.98l-1.12 1.68c-.46.69-1.34 1.01-2.14.82l-1.81-.42-1.3 1.3.42 1.81c.19.8.19 1.68-.42 2.14l-1.68 1.12v1.64l1.68 1.12c.69.46 1.01 1.34.82 2.14l-.42 1.81 1.3 1.3 1.81-.42c.8-.19 1.68.13 2.14.82l1.12 1.68h1.64l1.12-1.68c.46-.69 1.34-1.01 2.14-.82l1.81.42 1.3-1.3-.42-1.81c-.19-.8.13-1.68.82-2.14l1.68-1.12v-1.64l-1.68-1.12c-.69-.46-1.01-1.34-.82-2.14l.42-1.81-1.3-1.3-1.81.42c-.8.19-1.68-.13-2.14-.82l-1.12-1.68h-1.64zM12 7.75c-2.35 0-4.25 1.9-4.25 4.25s1.9 4.25 4.25 4.25 4.25-1.9 4.25-4.25-1.9-4.25-4.25-4.25zm0 2c1.24 0 2.25 1.01 2.25 2.25s-1.01 2.25-2.25 2.25-2.25-1.01-2.25-2.25 1.01-2.25 2.25-2.25z"></path></g></svg>`;
+  const BOARDS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-list w-5 h-5"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect><path d="M14 4h7"></path><path d="M14 9h7"></path><path d="M14 15h7"></path><path d="M14 20h7"></path></svg>`;
 
   function ensureStyleElement() {
     let style = document.getElementById(STYLE_ID);
@@ -51,6 +60,9 @@
     }
     if (features.hideOperatorMark) {
       css += "[title='運営マーク'] { display: none !important; }\n";
+    }
+    if (features.hideVerifiedMark) {
+      css += "[title='認証済みマーク'] { display: none !important; }\n";
     }
     if (features.hideVerifiedGroupMark) {
       css += "[title='認証済み団体マーク'] { display: none !important; }\n";
@@ -204,7 +216,7 @@
         @keyframes advModalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
       `;
     }
-    
+
     style.textContent = css;
 
     setupSidebarCollapse(features.collapseSidebarSections, features.collapseSidebarInitially);
@@ -214,6 +226,42 @@
     setupProfileButtonsHider(features.hideQrCode, features.hideProfileUrl);
     setupVideoPlayerEnhancer(features.enhanceVideoPlayer);
     setupAdvancedSearch(features.enableAdvancedSearch);
+    setupBoardsLink(features.showBoardsLink);
+    setupVBotCommands(features.enableVBotCommands);
+  }
+
+  function setupBoardsLink(enabled) {
+    if (boardsInterval) {
+      clearInterval(boardsInterval);
+      boardsInterval = null;
+    }
+
+    if (!enabled) {
+      document.querySelectorAll('a[href="/boards"][data-karotter-injected]').forEach(el => el.remove());
+      return;
+    }
+
+    boardsInterval = setInterval(() => {
+      const nav = document.querySelector('nav.space-y-2.flex-1');
+      if (!nav) return;
+
+      if (nav.querySelector('a[href="/boards"]')) return;
+
+      const messageLink = nav.querySelector('a[href="/dm"]');
+      if (!messageLink) return;
+
+      const boardsLink = document.createElement('a');
+      boardsLink.href = '/boards';
+      boardsLink.className = 'flex items-center space-x-3 px-4 py-2 rounded-full transition-colors relative text-gray-700 hover:bg-gray-100';
+      boardsLink.setAttribute('data-karotter-injected', 'true');
+
+      boardsLink.innerHTML = `
+        <div class="relative">${BOARDS_SVG}</div>
+        <span class="font-medium text-sm md:text-base">掲示板</span>
+      `;
+
+      messageLink.parentNode.insertBefore(boardsLink, messageLink.nextSibling);
+    }, 100);
   }
 
   let profileButtonsInterval = null;
@@ -286,7 +334,7 @@
       const videos = document.querySelectorAll('video:not([data-karotter-video-enhanced])');
       videos.forEach(video => {
         if (video.closest('.karotter-video-container')) return;
-        
+
         // Skip blob URLs as requested
         const src = video.src || (video.currentSrc ? video.currentSrc : "");
         if (src.startsWith('blob:')) return;
@@ -348,16 +396,16 @@
           currentTimeEl.textContent = formatTime(video.currentTime);
         };
 
-        video.addEventListener('play', () => { 
-          playBtn.innerHTML = PAUSE_ICON; 
+        video.addEventListener('play', () => {
+          playBtn.innerHTML = PAUSE_ICON;
           centerPlayBtn.classList.remove('visible');
           container.classList.remove('is-paused');
           resetHideTimer();
         });
-        video.addEventListener('pause', () => { 
-          playBtn.innerHTML = PLAY_ICON; 
+        video.addEventListener('pause', () => {
+          playBtn.innerHTML = PLAY_ICON;
           // Keep centerPlayBtn hidden as requested
-          container.classList.remove('is-paused'); 
+          container.classList.remove('is-paused');
           clearTimeout(hideTimer);
         });
 
@@ -520,7 +568,7 @@
     imageDownloadInterval = setInterval(() => {
       // Target images that are likely post images
       const imgs = document.querySelectorAll('img[src*="/uploads/posts/"]');
-      
+
       imgs.forEach(img => {
         // Find a suitable container (the immediate parent or common wrapper)
         const container = img.parentElement;
@@ -536,15 +584,15 @@
         btn.className = 'karotter-img-download-btn';
         btn.innerHTML = DOWNLOAD_SVG;
         btn.style.cssText = 'position: absolute; right: 8px; bottom: 8px; cursor: pointer; padding: 8px; border-radius: 10px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
-        
+
         btn.title = '画像をダウンロード';
-        btn.onmouseover = () => { 
-          btn.style.transform = 'scale(1.1)'; 
+        btn.onmouseover = () => {
+          btn.style.transform = 'scale(1.1)';
           btn.style.background = 'rgba(0,0,0,0.8)';
           btn.style.borderColor = 'rgba(255,255,255,0.4)';
         };
-        btn.onmouseout = () => { 
-          btn.style.transform = 'scale(1)'; 
+        btn.onmouseout = () => {
+          btn.style.transform = 'scale(1)';
           btn.style.background = 'rgba(0,0,0,0.6)';
           btn.style.borderColor = 'rgba(255,255,255,0.2)';
         };
@@ -552,12 +600,12 @@
         btn.onclick = (e) => {
           e.preventDefault();
           e.stopPropagation();
-          
+
           btn.style.opacity = '0.5';
           btn.style.pointerEvents = 'none';
 
           const filename = img.src.split('/').pop().split('?')[0] || 'karotter_image.png';
-          
+
           chrome.runtime.sendMessage({
             action: "download_image",
             url: img.src,
@@ -565,7 +613,7 @@
           }, (response) => {
             btn.style.opacity = '1';
             btn.style.pointerEvents = 'auto';
-            
+
             if (response && !response.success) {
               console.error('Download message failed:', response.error);
               // Final fallback: open in new tab if even background download fails
@@ -613,7 +661,7 @@
       span.replaceWith(document.createTextNode(span.textContent));
       if (parent) parent.normalize(); // Merge adjacent text nodes
     });
-    
+
     // Reset scanned status
     document.querySelectorAll('p[data-karotter-spoiler-scanned]').forEach(p => {
       p.removeAttribute('data-karotter-spoiler-scanned');
@@ -629,7 +677,7 @@
     spoilerInterval = setInterval(() => {
       // Find <p> tags that haven't been fully processed
       const ps = document.querySelectorAll('p:not([data-karotter-spoiler-scanned])');
-      
+
       ps.forEach(p => {
         // Tag as scanned immediately to avoid re-evaluating
         p.setAttribute('data-karotter-spoiler-scanned', 'true');
@@ -638,7 +686,7 @@
         const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
         let textNode;
         const nodesToReplace = [];
-        
+
         while (textNode = walker.nextNode()) {
           if (regex.test(textNode.nodeValue)) {
             nodesToReplace.push(textNode);
@@ -649,23 +697,23 @@
           const content = node.nodeValue;
           const fragments = document.createDocumentFragment();
           let lastIndex = 0;
-          
+
           content.replace(regex, (match, p1, offset) => {
             // Text before match
             fragments.appendChild(document.createTextNode(content.substring(lastIndex, offset)));
-            
+
             // The match itself, wrapped
             const span = document.createElement('span');
             span.className = 'karotter-spoiler';
             span.textContent = match;
             fragments.appendChild(span);
-            
+
             lastIndex = offset + match.length;
           });
-          
+
           // Text after last match
           fragments.appendChild(document.createTextNode(content.substring(lastIndex)));
-          
+
           // Replace original node
           node.parentNode.replaceChild(fragments, node);
         });
@@ -696,7 +744,7 @@
         btn.className = 'karotter-collapse-btn';
         btn.innerHTML = COLLAPSE_SVG;
         btn.style.cssText = 'position: absolute; right: 12px; top: 12px; cursor: pointer; padding: 4px; border-radius: 6px; color: inherit; opacity: 0.5; transition: .2s; border: none; background: transparent; display: flex; align-items: center; justify-content: center; z-index: 10;';
-        
+
         btn.onmouseover = () => { btn.style.opacity = '1'; btn.style.backgroundColor = 'rgba(128,128,128,0.1)'; };
         btn.onmouseout = () => { btn.style.opacity = '0.5'; btn.style.backgroundColor = 'transparent'; };
 
@@ -756,7 +804,7 @@
         btn.className = 'karotter-adv-search-btn';
         btn.innerHTML = ADVANCED_SEARCH_SVG;
         btn.title = '高度な検索';
-        
+
         btn.onclick = (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -765,7 +813,7 @@
 
         container.appendChild(btn);
         // Adjust input padding to not overlap with the button
-        input.style.paddingRight = '36px'; 
+        input.style.paddingRight = '36px';
       });
     }, 100);
   }
@@ -778,7 +826,7 @@
 
     overlay = document.createElement('div');
     overlay.className = 'karotter-adv-search-modal-overlay';
-    
+
     // Stop propagation so clicking inside doesn't close
     overlay.onclick = (e) => {
       if (e.target === overlay) {
@@ -889,10 +937,352 @@
       }
       overlay.remove();
     };
-    
+
     // Focus first input
     const firstInput = modal.querySelector('input');
     if (firstInput) firstInput.focus();
+  }
+
+  function setupVBotCommands(enabled) {
+    if (vbotInterval) {
+      clearInterval(vbotInterval);
+      vbotInterval = null;
+    }
+
+    if (!enabled) {
+      hideVBotCard();
+      return;
+    }
+
+    vbotInterval = setInterval(() => {
+      const textarea = document.querySelector('textarea[placeholder="いまどうしてる？"]');
+      if (!textarea) {
+        hideVBotCard();
+        return;
+      }
+
+      if (vbotAttachedTextarea !== textarea) {
+        if (vbotAttachedTextarea) {
+          vbotAttachedTextarea.removeEventListener('input', handleVBotInput);
+          vbotAttachedTextarea.removeEventListener('keydown', handleVBotKeyDown);
+          vbotAttachedTextarea.removeEventListener('blur', handleVBotBlur);
+        }
+        vbotAttachedTextarea = textarea;
+        vbotAttachedTextarea.addEventListener('input', handleVBotInput);
+        vbotAttachedTextarea.addEventListener('keydown', handleVBotKeyDown);
+        vbotAttachedTextarea.addEventListener('blur', handleVBotBlur);
+      }
+    }, 100);
+  }
+
+  const VBOT_COMMAND_DATA = [
+    { cat: "基本", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polyline points="4 17 10 11 4 5" /><line x1="12" x2="20" y1="19" y2="19" /></svg>`, cmd: "ping", desc: "ボットの生存確認を行います。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>` },
+    { cat: "ユーザー情報", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`, cmd: "info", desc: "自分のユーザー情報を表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` },
+    { cat: "ユーザー情報", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`, cmd: "info @user", desc: "指定したユーザーの情報を表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>` },
+    { cat: "Make it a Quote", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`, cmd: "quote", desc: "返信元の投稿を画像として引用します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1zM11 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-2c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/></svg>` },
+    { cat: "用語辞典（wiki）", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`, cmd: "wiki", desc: "用語辞典から情報を取得します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>` },
+    { cat: "用語辞典（wiki）", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`, cmd: "wiki search", desc: "用語辞典を検索します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>` },
+    { cat: "辞書管理", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`, cmd: "dict", desc: "辞書の一覧を表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>` },
+    { cat: "辞書管理", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`, cmd: "dict add", desc: "辞書に新用語を追加します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>` },
+    { cat: "辞書管理", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`, cmd: "dict del", desc: "辞書から用語を削除します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>` },
+    { cat: "評価", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`, cmd: "rate", desc: "自分を評価します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>` },
+    { cat: "投稿取得", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>`, cmd: "posts", desc: "最新の投稿を取得します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>` },
+    { cat: "フォロワー", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`, cmd: "followers", desc: "フォロワーの一覧を表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>` },
+    { cat: "フォロワー", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`, cmd: "followers @user", desc: "指定したユーザーのフォロワーを表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>` },
+    { cat: "ランキング", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`, cmd: "ranking", desc: "総合ランキングを表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>` },
+    { cat: "ランキング", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`, cmd: "ranking @user", desc: "指定ユーザーの順位を表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>` },
+    { cat: "ランキング", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`, cmd: "ranking followers", desc: "フォロワー数ランキングを表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>` },
+    { cat: "ランキング", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`, cmd: "ranking rate", desc: "評価ランキングを表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>` },
+    { cat: "ランキング", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>`, cmd: "ranking posts", desc: "投稿数ランキングを表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>` }
+  ];
+
+  function handleVBotInput(e) {
+    const textarea = e.target;
+    const text = textarea.value;
+    const cursorPos = textarea.selectionStart;
+
+    // Find the start of the current word
+    const lastAtPos = text.lastIndexOf('@vbot ', cursorPos);
+    if (lastAtPos === -1 || lastAtPos + 6 > cursorPos) {
+      hideVBotCard();
+      return;
+    }
+
+    const query = text.substring(lastAtPos + 6, cursorPos).trim().toLowerCase();
+    vbotFilteredCommands = VBOT_COMMAND_DATA.filter(c => c.cmd.toLowerCase().includes(query) || query === "");
+
+    if (vbotFilteredCommands.length === 0) {
+      hideVBotCard();
+      return;
+    }
+
+    showVBotCard(textarea, lastAtPos, query);
+  }
+
+  function handleVBotKeyDown(e) {
+    if (!vbotCard || vbotCard.style.display === 'none') return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      vbotSelectedIndex = (vbotSelectedIndex + 1) % vbotFilteredCommands.length;
+      renderVBotCommands();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      vbotSelectedIndex = (vbotSelectedIndex - 1 + vbotFilteredCommands.length) % vbotFilteredCommands.length;
+      renderVBotCommands();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      selectVBotCommand(vbotFilteredCommands[vbotSelectedIndex]);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      hideVBotCard();
+    }
+  }
+
+  function handleVBotBlur() {
+    // Small delay to allow click selection
+    setTimeout(hideVBotCard, 200);
+  }
+
+  function showVBotCard(textarea, atPos, query) {
+    if (!vbotCard) {
+      vbotCard = document.createElement('div');
+      vbotCard.id = 'vbot-assistant-card';
+      vbotCard.style.cssText = `
+        position: fixed;
+        width: 320px;
+        max-width: 90vw;
+        background: var(--surface-card, #fff);
+        border: 1px solid var(--border-soft, #eee);
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        z-index: 10000;
+        overflow: hidden;
+        display: none;
+        flex-direction: column;
+        touch-action: manipulation;
+      `;
+
+      const header = document.createElement('div');
+      header.style.cssText = `
+        padding: 12px 16px;
+        background: var(--accent, #1d9bf0);
+        color: #fff;
+        font-weight: 800;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 44px;
+      `;
+      header.innerHTML = `
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none"><polyline points="4 17 10 11 4 5" /><line x1="12" x2="20" y1="19" y2="19" /></svg>
+        <span>vbot コマンド一覧</span>
+      `;
+      vbotCard.appendChild(header);
+
+      const list = document.createElement('div');
+      list.id = 'vbot-command-list';
+      list.style.cssText = `
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 8px 0;
+        -webkit-overflow-scrolling: touch;
+      `;
+      vbotCard.appendChild(list);
+
+      const footer = document.createElement('div');
+      footer.id = 'vbot-assistant-footer';
+      footer.style.cssText = `
+        padding: 8px 16px;
+        border-top: 1px solid var(--border-soft, #eee);
+        font-size: 10px;
+        color: var(--text-faint, #888);
+        background: var(--bg-subtle, #f9f9f9);
+      `;
+      footer.innerHTML = `<span class="vbot-desktop-help">↑↓ で選択 • Enter で決定 • Esc で閉じる</span>`;
+      vbotCard.appendChild(footer);
+
+      // Add responsive style for the footer
+      const styleTag = document.createElement('style');
+      styleTag.textContent = `
+        @media (max-width: 768px) {
+          #vbot-assistant-footer { display: none !important; }
+        }
+      `;
+      document.head.appendChild(styleTag);
+
+      document.body.appendChild(vbotCard);
+    }
+
+    vbotSelectedIndex = 0;
+    renderVBotCommands();
+
+    const coords = getCaretCoordinates(textarea, atPos);
+    const rect = textarea.getBoundingClientRect();
+
+    // Position the card above the caret if possible, otherwise below
+    vbotCard.style.display = 'flex';
+    const cardHeight = vbotCard.offsetHeight;
+    const cardWidth = vbotCard.offsetWidth;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let top = rect.top + coords.top - cardHeight - 10;
+    if (top < 10) {
+      top = rect.top + coords.top + 24; // Below caret if no space above
+      if (top + cardHeight > viewportHeight - 10) {
+        top = viewportHeight - cardHeight - 10; // Clamp if also no space below
+      }
+    }
+
+    let left = rect.left + coords.left;
+    // Horizontal clamping
+    if (left + cardWidth > viewportWidth - 10) {
+      left = viewportWidth - cardWidth - 10;
+    }
+    if (left < 10) left = 10;
+
+    vbotCard.style.left = `${left}px`;
+    vbotCard.style.top = `${top}px`;
+  }
+
+  function renderVBotCommands() {
+    const list = vbotCard.querySelector('#vbot-command-list');
+    list.innerHTML = '';
+
+    let lastCat = null;
+    vbotFilteredCommands.forEach((c, index) => {
+      if (c.cat !== lastCat) {
+        const cat = document.createElement('div');
+        cat.style.cssText = `
+          padding: 12px 16px 4px;
+          font-size: 10px;
+          font-weight: 800;
+          color: var(--accent, #1d9bf0);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        `;
+        cat.innerHTML = `
+          <span style="display: flex; align-items: center; opacity: 0.8;">${c.catIcon}</span>
+          <span>${c.cat}</span>
+        `;
+        list.appendChild(cat);
+        lastCat = c.cat;
+      }
+
+      const item = document.createElement('div');
+      const isActive = index === vbotSelectedIndex;
+      item.style.cssText = `
+        padding: 10px 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: ${isActive ? 'var(--accent-soft, #eef8ff)' : 'transparent'};
+        border-left: 3px solid ${isActive ? 'var(--accent, #1d9bf0)' : 'transparent'};
+        min-height: 48px;
+        user-select: none;
+      `;
+      item.innerHTML = `
+        <div style="flex-shrink: 0; color: ${isActive ? 'var(--accent, #1d9bf0)' : 'var(--text-dim, #888)'}">${c.icon}</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <div style="font-weight: 700; font-size: 13px; color: ${isActive ? 'var(--accent, #1d9bf0)' : 'var(--text-primary, #000)'}">@vbot ${c.cmd}</div>
+          <div style="font-size: 11px; color: var(--text-dim, #666)">${c.desc}</div>
+        </div>
+      `;
+
+      item.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        selectVBotCommand(c);
+      };
+
+      list.appendChild(item);
+      if (isActive) {
+        item.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }
+
+  function selectVBotCommand(command) {
+    if (!vbotAttachedTextarea) return;
+    const textarea = vbotAttachedTextarea;
+    const text = textarea.value;
+    const cursorPos = textarea.selectionStart;
+    const lastAtPos = text.lastIndexOf('@vbot', cursorPos);
+
+    const before = text.substring(0, lastAtPos);
+    const after = text.substring(cursorPos);
+
+    let cmdToInsert = command.cmd;
+    if (cmdToInsert.includes('@user')) {
+      cmdToInsert = cmdToInsert.replace('@user', '@');
+    } else {
+      cmdToInsert += ' ';
+    }
+
+    const newVal = before + `@vbot ${cmdToInsert}` + after;
+
+    textarea.value = newVal;
+    textarea.focus();
+    const nextPos = lastAtPos + 6 + cmdToInsert.length;
+    textarea.setSelectionRange(nextPos, nextPos);
+
+    // Trigger input event to let the site know it changed
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+    hideVBotCard();
+  }
+
+  function hideVBotCard() {
+    if (vbotCard) {
+      vbotCard.style.display = 'none';
+    }
+  }
+
+  // Textarea caret position estimation (https://github.com/component/textarea-caret-position)
+  function getCaretCoordinates(element, position) {
+    const properties = [
+      'direction', 'boxSizing', 'width', 'height', 'overflowX', 'overflowY',
+      'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'borderStyle',
+      'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+      'fontStyle', 'fontVariant', 'fontWeight', 'fontStretch', 'fontSize', 'fontSizeAdjust', 'lineHeight', 'fontFamily',
+      'textAlign', 'textTransform', 'textIndent', 'textDecoration', 'letterSpacing', 'wordSpacing', 'tabSize', 'MozTabSize'
+    ];
+
+    const div = document.createElement('div');
+    div.id = 'input-textarea-caret-position-mirror-div';
+    document.body.appendChild(div);
+
+    const style = div.style;
+    const computed = window.getComputedStyle(element);
+
+    style.whiteSpace = 'pre-wrap';
+    style.wordWrap = 'break-word';
+    style.position = 'absolute';
+    style.visibility = 'hidden';
+
+    properties.forEach(prop => {
+      style[prop] = computed[prop];
+    });
+
+    div.textContent = element.value.substring(0, position);
+
+    const span = document.createElement('span');
+    span.textContent = element.value.substring(position) || '.';
+    div.appendChild(span);
+
+    const coordinates = {
+      top: span.offsetTop + parseInt(computed['borderTopWidth']),
+      left: span.offsetLeft + parseInt(computed['borderLeftWidth'])
+    };
+
+    document.body.removeChild(div);
+    return coordinates;
   }
 
   function applySettings(settings) {
