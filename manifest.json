@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Karotter Studio",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Karotterをより快適に。より柔軟にカスタマイズ。",
   "author": "NamiCode",
   "permissions": [
@@ -14,7 +14,11 @@
     "https://karotter.com/*",
     "https://*.karotter.com/*",
     "https://karotter.jp/*",
-    "https://*.karotter.jp/*"
+    "https://*.karotter.jp/*",
+    "https://karotter.karon.jp/*",
+    "https://*.karotter.karon.jp/*",
+    "https://apikarotter.karon.jp/*",
+    "https://*.apikarotter.karon.jp/*"
   ],
   "action": {
     "default_title": "Karotter Studio",
@@ -32,7 +36,11 @@
         "https://karotter.com/*",
         "https://*.karotter.com/*",
         "https://karotter.jp/*",
-        "https://*.karotter.jp/*"
+        "https://*.karotter.jp/*",
+        "https://karotter.karon.jp/*",
+        "https://*.karotter.karon.jp/*",
+        "https://apikarotter.karon.jp/*",
+        "https://*.apikarotter.karon.jp/*"
       ],
       "js": [
         "theme-engine.js",
@@ -52,7 +60,11 @@
         "https://karotter.com/*",
         "https://*.karotter.com/*",
         "https://karotter.jp/*",
-        "https://*.karotter.jp/*"
+        "https://*.karotter.jp/*",
+        "https://karotter.karon.jp/*",
+        "https://*.karotter.karon.jp/*",
+        "https://apikarotter.karon.jp/*",
+        "https://*.apikarotter.karon.jp/*"
       ]
     }
   ]

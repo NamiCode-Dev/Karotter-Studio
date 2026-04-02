@@ -13,6 +13,7 @@
   let advancedSearchInterval = null;
   let boardsInterval = null;
   let vbotInterval = null;
+  let hideRepliesInterval = null;
   let vbotCard = null;
   let vbotAttachedTextarea = null;
   let vbotSelectedIndex = 0;
@@ -228,6 +229,38 @@
     setupAdvancedSearch(features.enableAdvancedSearch);
     setupBoardsLink(features.showBoardsLink);
     setupVBotCommands(features.enableVBotCommands);
+    setupHideReplies(features.hideReplies);
+  }
+
+  function setupHideReplies(enabled) {
+    if (hideRepliesInterval) {
+      clearInterval(hideRepliesInterval);
+      hideRepliesInterval = null;
+    }
+
+    if (!enabled) {
+      document.querySelectorAll('[data-karotter-reply-hidden]').forEach(el => {
+        el.style.display = '';
+        el.removeAttribute('data-karotter-reply-hidden');
+      });
+      return;
+    }
+
+    hideRepliesInterval = setInterval(() => {
+      const isRoot = window.location.pathname === "/";
+      if (!isRoot) return;
+
+      const elements = document.querySelectorAll('.truncate');
+      elements.forEach(el => {
+        if (el.textContent.includes("返信先:")) {
+          const postContainer = el.closest('div.flex.gap-2\\.5.sm\\:gap-3.p-3.sm\\:p-4');
+          if (postContainer && postContainer.style.display !== 'none') {
+            postContainer.style.display = 'none';
+            postContainer.setAttribute('data-karotter-reply-hidden', 'true');
+          }
+        }
+      });
+    }, 100);
   }
 
   function setupBoardsLink(enabled) {

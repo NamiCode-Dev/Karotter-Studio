@@ -38,7 +38,8 @@
         hideProfileUrl: false,
         enableAdvancedSearch: false,
         showBoardsLink: false,
-        enableVBotCommands: false
+        enableVBotCommands: false,
+        hideReplies: false
       },
       fontFamily: "system",
       fontSource: "system",
@@ -102,7 +103,8 @@
       hideProfileUrl: !!f.hideProfileUrl,
       enableAdvancedSearch: !!f.enableAdvancedSearch,
       showBoardsLink: !!f.showBoardsLink,
-      enableVBotCommands: !!f.enableVBotCommands
+      enableVBotCommands: !!f.enableVBotCommands,
+      hideReplies: !!f.hideReplies
     };
   }
 

@@ -49,6 +49,7 @@
     enableAdvancedSearch: document.getElementById("enableAdvancedSearch"),
     showBoardsLink: document.getElementById("showBoardsLink"),
     enableVBotCommands: document.getElementById("enableVBotCommands"),
+    hideReplies: document.getElementById("hideReplies"),
     // Font - bundled
     fontSelect: document.getElementById("fontSelect"),
     fontSegmentedControl: document.getElementById("fontSegmentedControl"),
@@ -314,6 +315,7 @@
     elements.enableAdvancedSearch.checked = settings.features.enableAdvancedSearch;
     elements.showBoardsLink.checked = settings.features.showBoardsLink;
     elements.enableVBotCommands.checked = settings.features.enableVBotCommands;
+    elements.hideReplies.checked = settings.features.hideReplies;
     updateSubOptionStates();
   }
 
@@ -766,7 +768,7 @@
   });
 
   // Feature Toggles
-  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch", "showBoardsLink", "enableVBotCommands"].forEach(featureKey => {
+  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch", "showBoardsLink", "enableVBotCommands", "hideReplies"].forEach(featureKey => {
     const el = elements[featureKey];
     if (el) {
       el.addEventListener("change", function () {
