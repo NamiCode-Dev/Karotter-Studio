@@ -46,9 +46,12 @@
 > Chrome のサイドパネル機能に対応しています。拡張機能アイコンを右クリックして「サイドパネルで開く」を選択すると、タイムラインを見ながらリアルタイムで設定を変更できます。
 
 ### Firefox
-1. Firefox で `about:debugging#/runtime/this-firefox` を開きます。
-2. 「**一時的なアドオンを読み込む...**」をクリックします。
-3. 解凍したフォルダ内の **`firefox/manifest.json`** を選択してください。
+1. **未署名のアドオンのインストールを有効化します。**
+   - 設定方法は [Mozilla サポートの公式ガイド](https://support.mozilla.org/ja/kb/add-on-signing-in-firefox#w_wei-shu-ming-noadoonwoshi-itaichang-he-shang-ji-yu-za-xiang-ke) を参照し、必ず事前にチェックしてください。
+   - ※ 一般的な Firefox (Release 版) では制限があるため、上記ガイドに従って設定を変更する必要があります。
+2. Firefox で `about:addons` を開きます。
+3. 右上の歯車アイコン（アドオンの管理）をクリックし、「**ファイルからアドオンをインストール...**」を選択します。
+4. 解凍したフォルダ内の **`firefox/manifest.json`** を選択してください。
 
 > [!NOTE]
 > Firefox 版は標準でサイドパネル（サイドバー）で開くように設定されています。ツールバーのアイコンをクリックするだけで、サイドバーに設定画面が表示されます。

@@ -239,7 +239,7 @@
   }
 
   function renderSwatches(theme) {
-    elements.swatches.innerHTML = "";
+    elements.swatches.textContent = "";
 
     previewKeys.forEach(function (key) {
       const swatch = document.createElement("article");
@@ -251,7 +251,17 @@
 
       const copy = document.createElement("div");
       copy.className = "swatch-copy";
-      copy.innerHTML = "<span class=\"swatch-name\">" + key + "</span><span class=\"swatch-value\">" + theme[key] + "</span>";
+      
+      const nameSpan = document.createElement("span");
+      nameSpan.className = "swatch-name";
+      nameSpan.textContent = key;
+      
+      const valueSpan = document.createElement("span");
+      valueSpan.className = "swatch-value";
+      valueSpan.textContent = theme[key];
+      
+      copy.appendChild(nameSpan);
+      copy.appendChild(valueSpan);
 
       swatch.appendChild(color);
       swatch.appendChild(copy);
@@ -630,17 +640,24 @@
       })
       .catch(err => {
         console.error("Failed to load Google Fonts list:", err);
-        elements.googleFontsList.innerHTML = '<div class="google-fonts-loading">読み込み失敗</div>';
+        const errorDiv = document.createElement("div");
+        errorDiv.className = "google-fonts-loading";
+        errorDiv.textContent = "読み込み失敗";
+        elements.googleFontsList.textContent = "";
+        elements.googleFontsList.appendChild(errorDiv);
       });
   }
 
   function renderGoogleFontList(fonts) {
-    const CHECK_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    const CHECK_SVG_HTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
     
-    elements.googleFontsList.innerHTML = "";
+    elements.googleFontsList.textContent = "";
     
     if (fonts.length === 0) {
-      elements.googleFontsList.innerHTML = '<div class="google-fonts-loading">該当するフォントがありません</div>';
+      const emptyDiv = document.createElement("div");
+      emptyDiv.className = "google-fonts-loading";
+      emptyDiv.textContent = "該当するフォントがありません";
+      elements.googleFontsList.appendChild(emptyDiv);
       return;
     }
 
@@ -653,9 +670,21 @@
         item.classList.add("selected");
       }
       
-      item.innerHTML = '<span class="gfont-item-name">' + (font.label || font.family) + '</span>' +
-        '<span class="gfont-item-cat">' + font.category + '</span>' +
-        '<span class="gfont-item-check">' + CHECK_SVG + '</span>';
+      const nameSpan = document.createElement("span");
+      nameSpan.className = "gfont-item-name";
+      nameSpan.textContent = font.label || font.family;
+      
+      const catSpan = document.createElement("span");
+      catSpan.className = "gfont-item-cat";
+      catSpan.textContent = font.category;
+      
+      const checkSpan = document.createElement("span");
+      checkSpan.className = "gfont-item-check";
+      checkSpan.insertAdjacentHTML("afterbegin", CHECK_SVG_HTML);
+      
+      item.appendChild(nameSpan);
+      item.appendChild(catSpan);
+      item.appendChild(checkSpan);
       
       item.addEventListener("click", function () {
         // Deselect previous

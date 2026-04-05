@@ -288,10 +288,16 @@
       boardsLink.className = 'flex items-center space-x-3 px-4 py-2 rounded-full transition-colors relative text-gray-700 hover:bg-gray-100';
       boardsLink.setAttribute('data-karotter-injected', 'true');
 
-      boardsLink.innerHTML = `
-        <div class="relative">${BOARDS_SVG}</div>
-        <span class="font-medium text-sm md:text-base">掲示板</span>
-      `;
+      const svgContainer = document.createElement('div');
+      svgContainer.className = 'relative';
+      svgContainer.insertAdjacentHTML('afterbegin', BOARDS_SVG);
+      
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'font-medium text-sm md:text-base';
+      labelSpan.textContent = '掲示板';
+
+      boardsLink.appendChild(svgContainer);
+      boardsLink.appendChild(labelSpan);
 
       messageLink.parentNode.insertBefore(boardsLink, messageLink.nextSibling);
     }, 100);
@@ -389,22 +395,58 @@
 
         const ui = document.createElement('div');
         ui.className = 'karotter-video-ui';
-        ui.innerHTML = `
-          <div class="karotter-video-center-play visible">${PLAY_ICON}</div>
-          <div class="karotter-video-controls-wrapper">
-            <div class="karotter-video-controls" onclick="e => e.stopPropagation()">
-              <button class="karotter-video-btn play-pause">${PLAY_ICON}</button>
-              <div class="karotter-video-time current">0:00</div>
-              <div class="karotter-video-progress-container">
-                <div class="karotter-video-progress-bar"></div>
-              </div>
-              <div class="karotter-video-time duration">0:00</div>
-              <button class="karotter-video-btn karotter-video-speed-btn">1.0x</button>
-              <button class="karotter-video-btn download-video">${DOWNLOAD_UI_SVG}</button>
-              <button class="karotter-video-btn fullscreen">${FULLSCREEN_ICON}</button>
-            </div>
-          </div>
-        `;
+        const centerPlay = document.createElement('div');
+        centerPlay.className = 'karotter-video-center-play visible';
+        centerPlay.insertAdjacentHTML('afterbegin', PLAY_ICON);
+
+        const controlsWrapper = document.createElement('div');
+        controlsWrapper.className = 'karotter-video-controls-wrapper';
+        
+        const controls = document.createElement('div');
+        controls.className = 'karotter-video-controls';
+        controls.onclick = (e) => e.stopPropagation();
+
+        const pBtn = document.createElement('button');
+        pBtn.className = 'karotter-video-btn play-pause';
+        pBtn.insertAdjacentHTML('afterbegin', PLAY_ICON);
+
+        const cTime = document.createElement('div');
+        cTime.className = 'karotter-video-time current';
+        cTime.textContent = '0:00';
+
+        const pContainer = document.createElement('div');
+        pContainer.className = 'karotter-video-progress-container';
+        const pBar = document.createElement('div');
+        pBar.className = 'karotter-video-progress-bar';
+        pContainer.appendChild(pBar);
+
+        const dTime = document.createElement('div');
+        dTime.className = 'karotter-video-time duration';
+        dTime.textContent = '0:00';
+
+        const sBtn = document.createElement('button');
+        sBtn.className = 'karotter-video-btn karotter-video-speed-btn';
+        sBtn.textContent = '1.0x';
+
+        const dlBtn = document.createElement('button');
+        dlBtn.className = 'karotter-video-btn download-video';
+        dlBtn.insertAdjacentHTML('afterbegin', DOWNLOAD_UI_SVG);
+
+        const fsBtn = document.createElement('button');
+        fsBtn.className = 'karotter-video-btn fullscreen';
+        fsBtn.insertAdjacentHTML('afterbegin', FULLSCREEN_ICON);
+
+        controls.appendChild(pBtn);
+        controls.appendChild(cTime);
+        controls.appendChild(pContainer);
+        controls.appendChild(dTime);
+        controls.appendChild(sBtn);
+        controls.appendChild(dlBtn);
+        controls.appendChild(fsBtn);
+        
+        controlsWrapper.appendChild(controls);
+        ui.appendChild(centerPlay);
+        ui.appendChild(controlsWrapper);
         container.appendChild(ui);
 
         const playBtn = ui.querySelector('.play-pause');
@@ -615,7 +657,7 @@
 
         const btn = document.createElement('button');
         btn.className = 'karotter-img-download-btn';
-        btn.innerHTML = DOWNLOAD_SVG;
+        btn.insertAdjacentHTML('afterbegin', DOWNLOAD_SVG);
         btn.style.cssText = 'position: absolute; right: 8px; bottom: 8px; cursor: pointer; padding: 8px; border-radius: 10px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
 
         btn.title = '画像をダウンロード';
@@ -775,7 +817,7 @@
 
         const btn = document.createElement('button');
         btn.className = 'karotter-collapse-btn';
-        btn.innerHTML = COLLAPSE_SVG;
+        btn.insertAdjacentHTML('afterbegin', COLLAPSE_SVG);
         btn.style.cssText = 'position: absolute; right: 12px; top: 12px; cursor: pointer; padding: 4px; border-radius: 6px; color: inherit; opacity: 0.5; transition: .2s; border: none; background: transparent; display: flex; align-items: center; justify-content: center; z-index: 10;';
 
         btn.onmouseover = () => { btn.style.opacity = '1'; btn.style.backgroundColor = 'rgba(128,128,128,0.1)'; };
@@ -871,62 +913,97 @@
     modal.className = 'karotter-adv-search-modal';
     modal.onclick = (e) => e.stopPropagation();
 
-    modal.innerHTML = `
-      <div class="karotter-adv-search-header">
-        <h2>高度な検索</h2>
-        <button class="karotter-adv-search-close" title="閉じる">${CLOSE_SVG}</button>
-      </div>
-      <div class="karotter-adv-search-body">
-        <div class="karotter-adv-search-section">
-          <div class="section-title">単語</div>
-          <div class="karotter-adv-search-field">
-            <label>すべてのキーワードを含む</label>
-            <input type="text" id="adv-all" placeholder="例: Karotter Studio">
-          </div>
-          <div class="karotter-adv-search-field">
-            <label>次のフレーズに完全一致</label>
-            <input type="text" id="adv-exact" placeholder="例: Karotter Studio 最高">
-          </div>
-          <div class="karotter-adv-search-field">
-            <label>いずれかのキーワードを含む</label>
-            <input type="text" id="adv-any" placeholder="例: アニメ OR 漫画">
-          </div>
-          <div class="karotter-adv-search-field">
-            <label>次のキーワードを含まない</label>
-            <input type="text" id="adv-none" placeholder="例: ネタバレ">
-          </div>
-        </div>
-        
-        <div class="karotter-adv-search-section">
-          <div class="section-title">アカウント</div>
-          <div class="karotter-adv-search-field">
-            <label>次のアカウントからの送信</label>
-            <input type="text" id="adv-from" placeholder="例: @KarotterApp">
-          </div>
-          <div class="karotter-adv-search-field">
-            <label>次のアカウントへの返信</label>
-            <input type="text" id="adv-to" placeholder="例: @KarotterApp">
-          </div>
-        </div>
+    modal.innerHTML = '';
+    const header = document.createElement('div');
+    header.className = 'karotter-adv-search-header';
+    const title = document.createElement('h2');
+    title.textContent = '高度な検索';
+    const closeBtnInner = document.createElement('button');
+    closeBtnInner.className = 'karotter-adv-search-close';
+    closeBtnInner.title = '閉じる';
+    closeBtnInner.insertAdjacentHTML('afterbegin', CLOSE_SVG);
+    header.appendChild(title);
+    header.appendChild(closeBtnInner);
 
-        <div class="karotter-adv-search-section">
-          <div class="section-title">日付</div>
-          <div style="display: flex; gap: 16px;">
-            <div class="karotter-adv-search-field" style="flex: 1;">
-              <label>開始（Since）</label>
-              <input type="date" id="adv-since">
-            </div>
-            <div class="karotter-adv-search-field" style="flex: 1;">
-              <label>終了（Until）</label>
-              <input type="date" id="adv-until">
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="karotter-adv-search-footer">
-        <button class="karotter-adv-search-submit">検索</button>
-      </div>
-    `;
+    const body = document.createElement('div');
+    body.className = 'karotter-adv-search-body';
+
+    function addSection(titleText, fields) {
+      const section = document.createElement('div');
+      section.className = 'karotter-adv-search-section';
+      const sTitle = document.createElement('div');
+      sTitle.className = 'section-title';
+      sTitle.textContent = titleText;
+      section.appendChild(sTitle);
+      
+      fields.forEach(f => {
+        const field = document.createElement('div');
+        field.className = 'karotter-adv-search-field';
+        if (f.style) field.style.cssText = f.style;
+        const label = document.createElement('label');
+        label.textContent = f.label;
+        const input = document.createElement('input');
+        input.type = f.type || 'text';
+        input.id = f.id;
+        if (f.placeholder) input.placeholder = f.placeholder;
+        field.appendChild(label);
+        field.appendChild(input);
+        section.appendChild(field);
+      });
+      return section;
+    }
+
+    body.appendChild(addSection('単語', [
+      { label: 'すべてのキーワードを含む', id: 'adv-all', placeholder: '例: Karotter Studio' },
+      { label: '次のフレーズに完全一致', id: 'adv-exact', placeholder: '例: Karotter Studio 最高' },
+      { label: 'いずれかのキーワードを含む', id: 'adv-any', placeholder: '例: アニメ OR 漫画' },
+      { label: '次のキーワードを含まない', id: 'adv-none', placeholder: '例: ネタバレ' }
+    ]));
+
+    body.appendChild(addSection('アカウント', [
+      { label: '次のアカウントからの送信', id: 'adv-from', placeholder: '例: @KarotterApp' },
+      { label: '次のアカウントへの返信', id: 'adv-to', placeholder: '例: @KarotterApp' }
+    ]));
+
+    const dateSection = document.createElement('div');
+    dateSection.className = 'karotter-adv-search-section';
+    const dateTitle = document.createElement('div');
+    dateTitle.className = 'section-title';
+    dateTitle.textContent = '日付';
+    dateSection.appendChild(dateTitle);
+    
+    const dateFlex = document.createElement('div');
+    dateFlex.style.cssText = 'display: flex; gap: 16px;';
+    
+    const addDateField = (labelStr, idStr) => {
+      const field = document.createElement('div');
+      field.className = 'karotter-adv-search-field';
+      field.style.flex = '1';
+      const label = document.createElement('label');
+      label.textContent = labelStr;
+      const input = document.createElement('input');
+      input.type = 'date';
+      input.id = idStr;
+      field.appendChild(label);
+      field.appendChild(input);
+      return field;
+    };
+    
+    dateFlex.appendChild(addDateField('開始（Since）', 'adv-since'));
+    dateFlex.appendChild(addDateField('終了（Until）', 'adv-until'));
+    dateSection.appendChild(dateFlex);
+    body.appendChild(dateSection);
+
+    const footer = document.createElement('div');
+    footer.className = 'karotter-adv-search-footer';
+    const modalSubmitBtn = document.createElement('button');
+    modalSubmitBtn.className = 'karotter-adv-search-submit';
+    modalSubmitBtn.textContent = '検索';
+    footer.appendChild(modalSubmitBtn);
+
+    modal.appendChild(header);
+    modal.appendChild(body);
+    modal.appendChild(footer);
 
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
@@ -1108,10 +1185,10 @@
         gap: 8px;
         min-height: 44px;
       `;
-      header.innerHTML = `
-        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none"><polyline points="4 17 10 11 4 5" /><line x1="12" x2="20" y1="19" y2="19" /></svg>
-        <span>vbot コマンド一覧</span>
-      `;
+      header.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none"><polyline points="4 17 10 11 4 5" /><line x1="12" x2="20" y1="19" y2="19" /></svg>`);
+      const headerTitle = document.createElement('span');
+      headerTitle.textContent = 'vbot コマンド一覧';
+      header.appendChild(headerTitle);
       vbotCard.appendChild(header);
 
       const list = document.createElement('div');
@@ -1133,7 +1210,10 @@
         color: var(--text-faint, #888);
         background: var(--bg-subtle, #f9f9f9);
       `;
-      footer.innerHTML = `<span class="vbot-desktop-help">↑↓ で選択 • Enter で決定 • Esc で閉じる</span>`;
+      const footerHelp = document.createElement('span');
+      footerHelp.className = 'vbot-desktop-help';
+      footerHelp.textContent = '↑↓ で選択 • Enter で決定 • Esc で閉じる';
+      footer.appendChild(footerHelp);
       vbotCard.appendChild(footer);
 
       // Add responsive style for the footer
@@ -1199,10 +1279,15 @@
           align-items: center;
           gap: 6px;
         `;
-        cat.innerHTML = `
-          <span style="display: flex; align-items: center; opacity: 0.8;">${c.catIcon}</span>
-          <span>${c.cat}</span>
-        `;
+        const catIconSpan = document.createElement('span');
+        catIconSpan.style.cssText = 'display: flex; align-items: center; opacity: 0.8;';
+        catIconSpan.insertAdjacentHTML('afterbegin', c.catIcon);
+        
+        const catNameSpan = document.createElement('span');
+        catNameSpan.textContent = c.cat;
+        
+        cat.appendChild(catIconSpan);
+        cat.appendChild(catNameSpan);
         list.appendChild(cat);
         lastCat = c.cat;
       }
@@ -1220,13 +1305,26 @@
         min-height: 48px;
         user-select: none;
       `;
-      item.innerHTML = `
-        <div style="flex-shrink: 0; color: ${isActive ? 'var(--accent, #1d9bf0)' : 'var(--text-dim, #888)'}">${c.icon}</div>
-        <div style="display: flex; flex-direction: column; gap: 2px;">
-          <div style="font-weight: 700; font-size: 13px; color: ${isActive ? 'var(--accent, #1d9bf0)' : 'var(--text-primary, #000)'}">@vbot ${c.cmd}</div>
-          <div style="font-size: 11px; color: var(--text-dim, #666)">${c.desc}</div>
-        </div>
-      `;
+      const iconDiv = document.createElement('div');
+      iconDiv.style.cssText = `flex-shrink: 0; color: ${isActive ? 'var(--accent, #1d9bf0)' : 'var(--text-dim, #888)'}`;
+      iconDiv.insertAdjacentHTML('afterbegin', c.icon);
+      
+      const textWrap = document.createElement('div');
+      textWrap.style.cssText = 'display: flex; flex-direction: column; gap: 2px;';
+      
+      const cmdDiv = document.createElement('div');
+      cmdDiv.style.cssText = `font-weight: 700; font-size: 13px; color: ${isActive ? 'var(--accent, #1d9bf0)' : 'var(--text-primary, #000)'}`;
+      cmdDiv.textContent = `@vbot ${c.cmd}`;
+      
+      const descDiv = document.createElement('div');
+      descDiv.style.cssText = 'font-size: 11px; color: var(--text-dim, #666)';
+      descDiv.textContent = c.desc;
+      
+      textWrap.appendChild(cmdDiv);
+      textWrap.appendChild(descDiv);
+      
+      item.appendChild(iconDiv);
+      item.appendChild(textWrap);
 
       item.onclick = (e) => {
         e.preventDefault();
