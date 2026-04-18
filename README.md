@@ -2,7 +2,6 @@
 
 ![Version](https://img.shields.io/badge/version-1.5.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Chrome%20%7C%20Firefox-orange)
-![License](https://img.shields.io/badge/license-ISC-green)
 
 ---
 
