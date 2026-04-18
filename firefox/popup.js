@@ -583,7 +583,7 @@
   }
 
   function renderGoogleFontList(fonts) {
-    const CHECK_SVG_HTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    const CHECK_SVG_HTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="m20 6-11 11-5-5"/></svg>';
     
     elements.googleFontsList.textContent = "";
     

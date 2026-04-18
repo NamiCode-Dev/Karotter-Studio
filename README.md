@@ -34,24 +34,36 @@
 
 ## 🚀 導入方法
 
-[GitHub Releases](https://github.com/NamiCode-Dev/Karotter-Studio/releases) から最新の ZIP ファイルをダウンロードして解凍してください。
+> [!IMPORTANT]
+> **ZIPファイルをダウンロードする場合**
+> GitHub の画面右上にある緑色の「Code ＞ Download ZIP」ではなく、必ず **[GitHub Releases](https://github.com/NamiCode-Dev/Karotter-Studio/releases)** から最新バージョンの ZIP ファイルをダウンロードしてください。（Code からのダウンロードでは、一部のファイルが不足したり動作しなかったりする場合があります）
 
 ### Google Chrome
-1. Chrome で `chrome://extensions` を開きます。
-2. 右上の「**デベロッパー モード**」をオンにします。
-3. 「**パッケージ化されていない拡張機能を読み込む**」をクリックします。
-4. 解凍したフォルダのルート（`manifest.json` がある場所）を選択してください。
+1. [GitHub Releases](https://github.com/NamiCode-Dev/Karotter-Studio/releases) から最新の ZIP ファイルをダウンロードして解凍してください。
+2. Chrome で `chrome://extensions` を開きます。
+3. 右上の「**デベロッパー モード**」をオンにします。
+4. 「**パッケージ化されていない拡張機能を読み込む**」をクリックします。
+5. 解凍したフォルダのルート（`manifest.json` がある場所）を選択してください。
 
 > [!TIP]
 > Chrome のサイドパネル機能に対応しています。拡張機能アイコンを右クリックして「サイドパネルで開く」を選択すると、タイムラインを見ながらリアルタイムで設定を変更できます。
 
 ### Firefox
-1. **未署名のアドオンのインストールを有効化します。**
+Firefox には 2 通りのインストール方法があります。
+
+#### 1. ストアからインストール（推奨）
+公式のアドオンストアから直接インストールできます。自動更新が適用されるため、こちらを推奨します。
+- **[Firefox Add-ons ストアで入手](https://addons.mozilla.org/ja/firefox/addon/karotter-studio/)**
+
+#### 2. ファイルから手動でインストール
+開発版や特定のバージョンを使用したい場合に利用してください。
+1. [GitHub Releases](https://github.com/NamiCode-Dev/Karotter-Studio/releases) から最新の ZIP ファイルをダウンロードして解凍してください。
+2. **未署名のアドオンのインストールを有効化します。**
    - 設定方法は [Mozilla サポートの公式ガイド](https://support.mozilla.org/ja/kb/add-on-signing-in-firefox#w_wei-shu-ming-noadoonwoshi-itaichang-he-shang-ji-yu-za-xiang-ke) を参照し、必ず事前にチェックしてください。
    - ※ 一般的な Firefox (Release 版) では制限があるため、上記ガイドに従って設定を変更する必要があります。
-2. Firefox で `about:addons` を開きます。
-3. 右上の歯車アイコン（アドオンの管理）をクリックし、「**ファイルからアドオンをインストール...**」を選択します。
-4. 解凍したフォルダ内の **`firefox/manifest.json`** を選択してください。
+3. Firefox で `about:addons` を開きます。
+4. 右上の歯車アイコン（アドオンの管理）をクリックし、「**ファイルからアドオンをインストール...**」を選択します。
+5. 解凍したフォルダ内の **`firefox/manifest.json`** を選択してください。
 
 > [!NOTE]
 > Firefox 版は標準でサイドパネル（サイドバー）で開くように設定されています。ツールバーのアイコンをクリックするだけで、サイドバーに設定画面が表示されます。

@@ -3,7 +3,7 @@
   const storage = window.KarotterThemeStorage;
   const STYLE_ID = "karotter-custom-theme-style";
   const FEATURE_STYLE_ID = "karotter-feature-enhancements";
-  const COLLAPSE_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; stroke: var(--neutral-500) !important;"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
+  const COLLAPSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; stroke: var(--neutral-500) !important;" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>`;
   let collapseInterval = null;
   let spoilerInterval = null;
   let autoExpandInterval = null;
@@ -20,9 +20,9 @@
   let vbotFilteredCommands = [];
 
   // Icons are from Lucide Icons (ISC License: https://lucide.dev/)
-  const DOWNLOAD_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
-  const ADVANCED_SEARCH_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" width="18" height="18"><g><path d="M10.54 1.75h2.92l1.57 2.36c.11.17.32.25.53.21l2.53-.59 2.17 2.17-.58 2.54c-.05.2.04.41.22.53l2.36 1.57v2.92l-2.36 1.57c-.18.12-.27.33-.22.53l.58 2.54-2.17 2.17-2.53-.59c-.21-.04-.42.04-.53.21l-1.57 2.36h-2.92l-1.57-2.36c-.11-.17-.32-.25-.53-.21l-2.53.59-2.17-2.17.58-2.54c.05-.2-.04-.41-.22-.53l-2.36-1.57v-2.92l2.36-1.57c.18-.12.27-.33.22-.53l-.58-2.54 2.17-2.17 2.53.59c.21.04.42-.04.53-.21l1.57-2.36zm1.71 1.98l-1.12 1.68c-.46.69-1.34 1.01-2.14.82l-1.81-.42-1.3 1.3.42 1.81c.19.8.19 1.68-.42 2.14l-1.68 1.12v1.64l1.68 1.12c.69.46 1.01 1.34.82 2.14l-.42 1.81 1.3 1.3 1.81-.42c.8-.19 1.68.13 2.14.82l1.12 1.68h1.64l1.12-1.68c.46-.69 1.34-1.01 2.14-.82l1.81.42 1.3-1.3-.42-1.81c-.19-.8.13-1.68.82-2.14l1.68-1.12v-1.64l-1.68-1.12c-.69-.46-1.01-1.34-.82-2.14l.42-1.81-1.3-1.3-1.81.42c-.8.19-1.68-.13-2.14-.82l-1.12-1.68h-1.64zM12 7.75c-2.35 0-4.25 1.9-4.25 4.25s1.9 4.25 4.25 4.25 4.25-1.9 4.25-4.25-1.9-4.25-4.25-4.25zm0 2c1.24 0 2.25 1.01 2.25 2.25s-1.01 2.25-2.25 2.25-2.25-1.01-2.25-2.25 1.01-2.25 2.25-2.25z"></path></g></svg>`;
-  const BOARDS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-list w-5 h-5"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect><path d="M14 4h7"></path><path d="M14 9h7"></path><path d="M14 15h7"></path><path d="M14 20h7"></path></svg>`;
+  const DOWNLOAD_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>`;
+  const ADVANCED_SEARCH_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-2"><path d="M14 17H5"/><path d="M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>`;
+  const BOARDS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right w-5 h-5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/></svg>`;
 
   function ensureStyleElement() {
     let style = document.getElementById(STYLE_ID);
@@ -364,10 +364,10 @@
       return;
     }
 
-    const PLAY_ICON = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+    const PLAY_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-play"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997A1 1 0 0 1 9 14.996z"/></svg>`;
     const PAUSE_ICON = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
     const FULLSCREEN_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>`;
-    const DOWNLOAD_UI_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+    const DOWNLOAD_UI_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>`;
 
     videoEnhanceInterval = setInterval(() => {
       const videos = document.querySelectorAll('video:not([data-karotter-video-enhanced])');
