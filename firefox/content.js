@@ -219,7 +219,11 @@
         }
         .karotter-adv-search-submit:hover { opacity: 0.9; }
         @keyframes advModalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+      `;
+    }
 
+    if (features.enableModernLinkPreview) {
+      css += `
         /* Modern Link Preview */
         .ks-link-card {
           display: block;
