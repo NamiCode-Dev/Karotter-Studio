@@ -1,3 +1,7 @@
+# Karotter Studio
+
+---
+
 **Karotter Studio** は、[karotter.com](https://karotter.com) およびそのサブドメイン（`apikarotter.karon.jp` 等を含む）のエクスペリエンスを劇的に進化させるブラウザ拡張機能（Chrome & Firefox 対応）です。強力なテーマエンジンによる自由な外観カスタマイズから、集中力を高める機能拡張まで。あなたのブラウジングを「スタジオ」に変えます。
 
 ---
