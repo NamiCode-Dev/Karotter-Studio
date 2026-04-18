@@ -16,6 +16,7 @@
   let hideRepliesInterval = null;
   let userProfileLinksInterval = null;
   let glossaryInterval = null;
+  let modernLinkPreviewInterval = null;
   let vbotCard = null;
   let vbotAttachedTextarea = null;
   let vbotSelectedIndex = 0;
@@ -218,6 +219,102 @@
         }
         .karotter-adv-search-submit:hover { opacity: 0.9; }
         @keyframes advModalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* Modern Link Preview */
+        .ks-link-card {
+          display: block;
+          position: relative;
+          width: 100%;
+          aspect-ratio: 1.91 / 1;
+          border-radius: 16px;
+          overflow: hidden;
+          border: 1px solid var(--border-soft, #e2e8f0);
+          background-color: var(--surface-soft, #f8fafc);
+          text-decoration: none;
+          transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease;
+          isolation: isolate;
+          margin: 12px 0;
+        }
+        .ks-link-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+        }
+        .ks-link-card-image-wrap {
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+        }
+        .ks-link-card-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.6s cubic-bezier(0.2, 0, 0, 1);
+        }
+        .ks-link-card:hover .ks-link-card-image {
+          transform: scale(1.03);
+        }
+        .ks-link-card-overlay {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          padding: 40px 16px 12px;
+          background: linear-gradient(to top, 
+            rgba(0, 0, 0, 0.85) 0%, 
+            rgba(0, 0, 0, 0.4) 60%, 
+            transparent 100%
+          );
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          height: 100%;
+          box-sizing: border-box;
+        }
+        .ks-link-card-content {
+          color: #ffffff !important;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+          pointer-events: none;
+        }
+        .ks-link-card-site-info {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 4px;
+          font-size: 11px;
+          font-weight: 500;
+          opacity: 0.9;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: #ffffff !important;
+        }
+        .ks-link-card-url {
+          opacity: 0.7;
+          color: #ffffff !important;
+        }
+        .ks-link-card-title {
+          margin: 0;
+          font-size: 15px;
+          font-weight: 700;
+          line-height: 1.3;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          margin-bottom: 4px;
+          color: #ffffff !important;
+        }
+        .ks-link-card-desc {
+          margin: 0;
+          font-size: 12px;
+          line-height: 1.4;
+          opacity: 0.85;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          font-weight: 400;
+          color: #ffffff !important;
+        }
       `;
     }
 
@@ -232,6 +329,7 @@
     setupAdvancedSearch(features.enableAdvancedSearch);
     setupBoardsLink(features.showBoardsLink);
     setupGlossaryLink(features.showGlossaryLink);
+    setupModernLinkPreview(features.enableModernLinkPreview);
     setupVBotCommands(features.enableVBotCommands);
     setupHideReplies(features.hideReplies);
     setupUserProfileLinks(features.enableUserProfileLinks);
@@ -412,6 +510,83 @@
       glossaryLink.appendChild(labelSpan);
 
       targetBase.parentNode.insertBefore(glossaryLink, targetBase.nextSibling);
+    }, 100);
+  }
+
+  function setupModernLinkPreview(enabled) {
+    if (modernLinkPreviewInterval) {
+      clearInterval(modernLinkPreviewInterval);
+      modernLinkPreviewInterval = null;
+    }
+
+    if (!enabled) {
+      // 元に戻す処理
+      document.querySelectorAll('.ks-link-card').forEach(el => el.remove());
+      document.querySelectorAll('.ks-hidden-card').forEach(el => {
+        el.style.display = '';
+        el.classList.remove('ks-hidden-card');
+      });
+      return;
+    }
+
+    modernLinkPreviewInterval = setInterval(() => {
+      // 既存のリンクプレビューカードを探す（Tailwindクラスをヒントにする）
+      const cards = document.querySelectorAll('a.group.block.overflow-hidden.rounded-2xl:not(.ks-link-card):not(.ks-hidden-card)');
+      cards.forEach(oldCard => {
+        try {
+          const href = oldCard.getAttribute('href');
+          const img = oldCard.querySelector('img');
+          if (!img) return;
+          
+          const imgSrc = img.src;
+          const imgAlt = img.alt || '';
+          
+          // タイトル
+          const titleEl = oldCard.querySelector('.break-words.text-\\[15px\\]');
+          // 説明文
+          const descEl = oldCard.querySelector('.line-clamp-3');
+          // URL
+          const urlEl = oldCard.querySelector('.truncate.text-\\[11px\\]');
+          // サイト名
+          const siteNameEl = oldCard.querySelector('.truncate.text-xs');
+
+          const title = titleEl ? titleEl.textContent.trim() : '';
+          const desc = descEl ? descEl.textContent.trim() : '';
+          const url = urlEl ? urlEl.textContent.trim() : '';
+          const siteName = siteNameEl ? siteNameEl.textContent.trim() : '';
+
+          if (!title && !desc) return;
+
+          const link = document.createElement('a');
+          link.href = href;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.className = "ks-link-card";
+          
+          link.innerHTML = `
+            <div class="ks-link-card-image-wrap">
+              <img src="${imgSrc}" alt="${imgAlt}" class="ks-link-card-image" loading="lazy">
+            </div>
+            <div class="ks-link-card-overlay">
+              <div class="ks-link-card-content">
+                <div class="ks-link-card-site-info">
+                  <span class="ks-link-card-site-name">${siteName || 'Link'}</span>
+                  <span class="ks-link-card-url">${url}</span>
+                </div>
+                <h3 class="ks-link-card-title">${title}</h3>
+                <p class="ks-link-card-desc">${desc}</p>
+              </div>
+            </div>
+          `;
+
+          // 置き換え
+          oldCard.style.display = 'none';
+          oldCard.classList.add('ks-hidden-card');
+          oldCard.parentNode.insertBefore(link, oldCard);
+        } catch (e) {
+          // エラー時はスキップ
+        }
+      });
     }, 100);
   }
 

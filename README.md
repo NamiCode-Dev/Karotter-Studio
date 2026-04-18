@@ -1,6 +1,6 @@
 # Karotter Studio
 
-![Version](https://img.shields.io/badge/version-1.5.0-blue)
+![Version](https://img.shields.io/badge/version-1.6.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Chrome%20%7C%20Firefox-orange)
 
 ---
@@ -48,7 +48,7 @@
 - **Firefox 版の公式サポート**: Firefox 向けに Manifest V3 で移植。サイドパネル（サイドバー）標準対応により、よりシームレスな操作性を実現。
 - **UI 設定の整理**: 「返信を非表示」設定を「UI の簡素化」セクションへ移動し、より直感的にアクセスできるよう改善。
 - **文言のブラッシュアップ**: 設定画面の各項目の説明文をよりわかりやすく、適切な表現に修正。
-- **バージョンアップ**: 内部バージョンおよび UI 表示を 1.5.0 に更新。
+- **バージョンアップ**: 内部バージョンおよび UI 表示を 1.6.0 に更新。
 
 ---
 

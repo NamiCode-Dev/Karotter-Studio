@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Karotter Studio",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Karotterをより快適に。より柔軟にカスタマイズ。",
   "author": "NamiCode",
   "browser_specific_settings": {
