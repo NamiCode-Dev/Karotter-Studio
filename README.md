@@ -1,8 +1,25 @@
 # Karotter Studio
 
+![Version](https://img.shields.io/badge/version-1.5.0-blue)
+![Platform](https://img.shields.io/badge/platform-Chrome%20%7C%20Firefox-orange)
+![License](https://img.shields.io/badge/license-ISC-green)
+
 ---
 
 **Karotter Studio** は、[karotter.com](https://karotter.com) およびそのサブドメイン（`apikarotter.karon.jp` 等を含む）のエクスペリエンスを劇的に進化させるブラウザ拡張機能（Chrome & Firefox 対応）です。強力なテーマエンジンによる自由な外観カスタマイズから、集中力を高める機能拡張まで。あなたのブラウジングを「スタジオ」に変えます。
+
+---
+
+## 📖 目次
+- [✨ 主な機能](#-主な機能)
+  - [🎨 究極の外観カスタマイズ](#-究極の外観カスタマイズ)
+  - [🛠️ 直感的な機能拡張](#-直感的な機能拡張)
+- [🚀 導入方法](#-導入方法)
+  - [Google Chrome](#google-chrome)
+  - [Firefox](#firefox)
+- [📁 プロジェクト構成](#-プロジェクト構成)
+- [🛠️ 開発者向け](#-開発者向け)
+- [⚖️ サードパーティ・ライセンス / Credits](#-サードパーティライセンス--credits)
 
 ---
 

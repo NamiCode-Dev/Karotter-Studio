@@ -14,6 +14,8 @@
   let boardsInterval = null;
   let vbotInterval = null;
   let hideRepliesInterval = null;
+  let userProfileLinksInterval = null;
+  let glossaryInterval = null;
   let vbotCard = null;
   let vbotAttachedTextarea = null;
   let vbotSelectedIndex = 0;
@@ -23,6 +25,7 @@
   const DOWNLOAD_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>`;
   const ADVANCED_SEARCH_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-2"><path d="M14 17H5"/><path d="M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>`;
   const BOARDS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right w-5 h-5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/></svg>`;
+  const GLOSSARY_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text w-5 h-5"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg>`;
 
   function ensureStyleElement() {
     let style = document.getElementById(STYLE_ID);
@@ -228,8 +231,10 @@
     setupVideoPlayerEnhancer(features.enhanceVideoPlayer);
     setupAdvancedSearch(features.enableAdvancedSearch);
     setupBoardsLink(features.showBoardsLink);
+    setupGlossaryLink(features.showGlossaryLink);
     setupVBotCommands(features.enableVBotCommands);
     setupHideReplies(features.hideReplies);
+    setupUserProfileLinks(features.enableUserProfileLinks);
   }
 
   function setupHideReplies(enabled) {
@@ -258,6 +263,60 @@
             postContainer.style.display = 'none';
             postContainer.setAttribute('data-karotter-reply-hidden', 'true');
           }
+        }
+      });
+    }, 100);
+  }
+
+  function setupUserProfileLinks(enabled) {
+    if (userProfileLinksInterval) {
+      clearInterval(userProfileLinksInterval);
+      userProfileLinksInterval = null;
+    }
+
+    if (!enabled) return;
+
+    userProfileLinksInterval = setInterval(() => {
+      const articles = document.querySelectorAll('article');
+      
+      articles.forEach(article => {
+        const header = article.querySelector('div.mb-2.flex.flex-wrap.items-center.gap-2');
+        if (!header) return;
+
+        const spans = header.querySelectorAll('span');
+        let userId = null;
+        for (const span of spans) {
+          const text = span.textContent.trim();
+          if (text.startsWith('@') && text.length > 1) {
+            userId = text.substring(1).split(' ')[0];
+            break;
+          }
+        }
+
+        if (!userId) return;
+
+        const profileUrl = `${location.protocol}//${location.host}/profile/${userId}`;
+
+        const icon = header.querySelector('img.h-6.w-6.rounded-full.object-cover');
+        if (icon && !icon.closest('a')) {
+          const a = document.createElement('a');
+          a.href = profileUrl;
+          a.className = 'karotter-profile-link';
+          a.style.display = 'inline-flex';
+          icon.parentNode.insertBefore(a, icon);
+          a.appendChild(icon);
+        }
+
+        const username = header.querySelector('span.font-semibold');
+        if (username && !username.closest('a') && username.textContent.trim().length > 0) {
+          const a = document.createElement('a');
+          a.href = profileUrl;
+          a.className = 'karotter-profile-link';
+          a.style.display = 'inline-block';
+          a.style.color = 'inherit';
+          a.style.textDecoration = 'none';
+          username.parentNode.insertBefore(a, username);
+          a.appendChild(username);
         }
       });
     }, 100);
@@ -300,6 +359,50 @@
       boardsLink.appendChild(labelSpan);
 
       messageLink.parentNode.insertBefore(boardsLink, messageLink.nextSibling);
+    }, 100);
+  }
+
+  function setupGlossaryLink(enabled) {
+    if (glossaryInterval) {
+      clearInterval(glossaryInterval);
+      glossaryInterval = null;
+    }
+
+    if (!enabled) {
+      document.querySelectorAll('a[data-karotter-glossary-link]').forEach(el => el.remove());
+      return;
+    }
+
+    glossaryInterval = setInterval(() => {
+      const nav = document.querySelector('nav.space-y-2.flex-1');
+      if (!nav) return;
+
+      if (nav.querySelector('a[data-karotter-glossary-link]')) return;
+
+      const boardsLink = nav.querySelector('a[href="/boards"]');
+      const messageLink = nav.querySelector('a[href="/dm"]');
+      const targetBase = boardsLink || messageLink;
+      if (!targetBase) return;
+
+      const glossaryLink = document.createElement('a');
+      glossaryLink.href = 'https://karotter-wiki.vercel.app/index/index.html';
+      glossaryLink.target = '_blank';
+      glossaryLink.className = 'flex items-center space-x-3 px-4 py-2 rounded-full transition-colors relative text-gray-700 hover:bg-gray-100';
+      glossaryLink.setAttribute('data-karotter-glossary-link', 'true');
+      glossaryLink.setAttribute('data-karotter-injected', 'true');
+
+      const svgContainer = document.createElement('div');
+      svgContainer.className = 'relative';
+      svgContainer.insertAdjacentHTML('afterbegin', GLOSSARY_SVG);
+
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'font-medium text-sm md:text-base';
+      labelSpan.textContent = '用語辞典';
+
+      glossaryLink.appendChild(svgContainer);
+      glossaryLink.appendChild(labelSpan);
+
+      targetBase.parentNode.insertBefore(glossaryLink, targetBase.nextSibling);
     }, 100);
   }
 

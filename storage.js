@@ -39,7 +39,9 @@
         enableAdvancedSearch: false,
         showBoardsLink: false,
         enableVBotCommands: false,
-        hideReplies: false
+        hideReplies: false,
+        enableUserProfileLinks: false,
+        showGlossaryLink: false
       },
       fontFamily: "system",
       fontSource: "system",
@@ -104,7 +106,9 @@
       enableAdvancedSearch: !!f.enableAdvancedSearch,
       showBoardsLink: !!f.showBoardsLink,
       enableVBotCommands: !!f.enableVBotCommands,
-      hideReplies: !!f.hideReplies
+      hideReplies: !!f.hideReplies,
+      enableUserProfileLinks: !!f.enableUserProfileLinks,
+      showGlossaryLink: !!f.showGlossaryLink
     };
   }
 
