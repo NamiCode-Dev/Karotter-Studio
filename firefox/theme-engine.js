@@ -522,9 +522,19 @@
 
   function buildUtilityOverrideCss() {
     return [
-      "html, body, #root { font-family: var(--app-font, inherit) !important; }",
+      "html, body, #root, [data-sonner-toast] { font-family: var(--app-font, inherit) !important; }",
       ".bg-blue-50{background-color:var(--accent-soft)!important;}",
+      ".bg-blue-100{background-color:color-mix(in srgb,var(--accent) 10%,#ffffff)!important;}",
+      ".bg-blue-200{background-color:color-mix(in srgb,var(--accent) 22%,#ffffff)!important;}",
+      ".bg-blue-300{background-color:color-mix(in srgb,var(--accent) 38%,#ffffff)!important;}",
+      ".bg-blue-400{background-color:color-mix(in srgb,var(--accent) 55%,#ffffff)!important;}",
+      ".bg-blue-500{background-color:color-mix(in srgb,var(--accent) 75%,#ffffff)!important;}",
       ".bg-blue-600{background-color:var(--accent)!important;border-color:var(--accent)!important;}",
+      ".text-blue-500{color:color-mix(in srgb,var(--accent) 85%,#000000)!important;}",
+      ".text-blue-600{color:var(--accent)!important;}",
+      ".border-blue-300{border-color:color-mix(in srgb,var(--accent) 45%,#ffffff)!important;}",
+      ".border-blue-400{border-color:color-mix(in srgb,var(--accent) 65%,#ffffff)!important;}",
+      ".border-blue-500{border-color:color-mix(in srgb,var(--accent) 85%,#ffffff)!important;}",
       ".border-blue-600{--tw-border-opacity:1!important;border-color:var(--accent)!important;}",
       ".hover\\:bg-blue-700:hover{background-color:var(--link-accent-hover)!important;border-color:var(--link-accent-hover)!important;}",
       ".disabled\\:bg-blue-300:disabled{background-color:color-mix(in srgb,var(--accent) 38%,#ffffff 62%)!important;}",
