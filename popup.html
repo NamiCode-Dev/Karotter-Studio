@@ -13,7 +13,6 @@
     <header class="hero-card">
       <div class="hero-top">
         <div class="hero-id">
-          <img src="logo/icon128.png" alt="Karotter Studio" class="hero-logo">
           <h1>Karotter Studio</h1>
         </div>
       </div>
@@ -267,7 +266,7 @@
                       <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                     </svg>
                   </div>
-                  <span id="backgroundLabel">画像をドラッグまたは選択</span>
+                  <span id="backgroundLabel">画像をドラッグまたは選択 (GIF対応)</span>
                 </div>
               </div>
             </div>
@@ -315,49 +314,107 @@
 
           <div class="settings-group">
             <div class="field">
-              <span class="field-label">ベースカラー</span>
-              <div class="color-picker-modern">
-                <div class="color-preview-wrapper">
-                  <input id="seedColor" type="color" value="#1d9bf0">
-                  <div class="color-preview-overlay" id="colorPreviewOverlay"></div>
-                </div>
-                <input id="seedHex" type="text" value="#1d9bf0" spellcheck="false" maxlength="7">
-              </div>
-            </div>
-
-            <div class="field">
-              <span class="field-label">配色モード</span>
-              <div class="segmented-control" id="modeSegmentedControl">
-                <button type="button" class="segment" data-value="light">ライト</button>
-                <button type="button" class="segment" data-value="soft">ソフト</button>
-                <button type="button" class="segment" data-value="dim">ディム</button>
-                <button type="button" class="segment" data-value="dark">ダーク</button>
+              <span class="field-label">テーマ作成方法</span>
+              <div class="segmented-control" id="creationModeControl">
+                <button type="button" class="segment" data-value="automatic">オートマチック</button>
+                <button type="button" class="segment" data-value="manual">マニュアル</button>
                 <div class="segment-indicator"></div>
               </div>
-              <select id="modeSelect" style="display: none;">
-                <option value="light">ライト</option>
-                <option value="soft">ソフト</option>
-                <option value="dim">ディム</option>
-                <option value="dark">ダーク</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="sliders-grid">
-            <div class="slider-item">
-              <div class="slider-head">
-                <span class="slider-label">彩度の調整</span>
-                <output class="slider-value" id="saturationValue">0</output>
-              </div>
-              <input id="saturationRange" type="range" min="-40" max="40" value="0">
             </div>
 
-            <div class="slider-item">
-              <div class="slider-head">
-                <span class="slider-label">明るさの調整</span>
-                <output class="slider-value" id="lightnessValue">0</output>
+            <!-- Automatic Mode -->
+            <div id="automaticSettings">
+              <div class="field">
+                <span class="field-label">ベースカラー</span>
+                <div class="color-picker-modern">
+                  <div class="color-preview-wrapper">
+                    <input id="seedColor" type="color" value="#1d9bf0">
+                    <div class="color-preview-overlay" id="colorPreviewOverlay"></div>
+                  </div>
+                  <input id="seedHex" type="text" value="#1d9bf0" spellcheck="false" maxlength="7">
+                </div>
               </div>
-              <input id="lightnessRange" type="range" min="-30" max="30" value="0">
+
+              <div class="field">
+                <span class="field-label">配色モード</span>
+                <div class="segmented-control" id="modeSegmentedControl">
+                  <button type="button" class="segment" data-value="light">ライト</button>
+                  <button type="button" class="segment" data-value="soft">ソフト</button>
+                  <button type="button" class="segment" data-value="dim">ディム</button>
+                  <button type="button" class="segment" data-value="dark">ダーク</button>
+                  <div class="segment-indicator"></div>
+                </div>
+                <select id="modeSelect" style="display: none;">
+                  <option value="light">ライト</option>
+                  <option value="soft">ソフト</option>
+                  <option value="dim">ディム</option>
+                  <option value="dark">ダーク</option>
+                </select>
+              </div>
+
+              <div class="sliders-grid">
+                <div class="slider-item">
+                  <div class="slider-head">
+                    <span class="slider-label">彩度の調整</span>
+                    <output class="slider-value" id="saturationValue">0</output>
+                  </div>
+                  <input id="saturationRange" type="range" min="-40" max="40" value="0">
+                </div>
+
+                <div class="slider-item">
+                  <div class="slider-head">
+                    <span class="slider-label">明るさの調整</span>
+                    <output class="slider-value" id="lightnessValue">0</output>
+                  </div>
+                  <input id="lightnessRange" type="range" min="-30" max="30" value="0">
+                </div>
+              </div>
+            </div>
+
+            <!-- Manual Mode -->
+            <div id="manualSettings" style="display: none;">
+              <div class="manual-palette-grid">
+                <div class="field">
+                  <span class="field-label">アクセント</span>
+                  <div class="color-picker-modern mini">
+                    <div class="color-preview-wrapper">
+                      <input type="color" id="manualAccent" value="#1d9bf0">
+                      <div class="color-preview-overlay"></div>
+                    </div>
+                    <input type="text" id="manualAccentHex" class="manual-hex-input" value="#1d9bf0" spellcheck="false" maxlength="7">
+                  </div>
+                </div>
+                <div class="field">
+                  <span class="field-label">背景</span>
+                  <div class="color-picker-modern mini">
+                    <div class="color-preview-wrapper">
+                      <input type="color" id="manualBg" value="#f0f3f5">
+                      <div class="color-preview-overlay"></div>
+                    </div>
+                    <input type="text" id="manualBgHex" class="manual-hex-input" value="#f0f3f5" spellcheck="false" maxlength="7">
+                  </div>
+                </div>
+                <div class="field">
+                  <span class="field-label">サーフェス</span>
+                  <div class="color-picker-modern mini">
+                    <div class="color-preview-wrapper">
+                      <input type="color" id="manualSurface" value="#ffffff">
+                      <div class="color-preview-overlay"></div>
+                    </div>
+                    <input type="text" id="manualSurfaceHex" class="manual-hex-input" value="#ffffff" spellcheck="false" maxlength="7">
+                  </div>
+                </div>
+                <div class="field">
+                  <span class="field-label">テキスト</span>
+                  <div class="color-picker-modern mini">
+                    <div class="color-preview-wrapper">
+                      <input type="color" id="manualText" value="#0f1419">
+                      <div class="color-preview-overlay"></div>
+                    </div>
+                    <input type="text" id="manualTextHex" class="manual-hex-input" value="#0f1419" spellcheck="false" maxlength="7">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>

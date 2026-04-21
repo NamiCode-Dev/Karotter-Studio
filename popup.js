@@ -27,6 +27,18 @@
     swatches: document.getElementById("swatches"),
     resetBtn: document.getElementById("resetBtn"),
     openSiteBtn: document.getElementById("openSiteBtn"),
+    // Generator Mode
+    creationModeControl: document.getElementById("creationModeControl"),
+    automaticSettings: document.getElementById("automaticSettings"),
+    manualSettings: document.getElementById("manualSettings"),
+    manualAccent: document.getElementById("manualAccent"),
+    manualAccentHex: document.getElementById("manualAccentHex"),
+    manualBg: document.getElementById("manualBg"),
+    manualBgHex: document.getElementById("manualBgHex"),
+    manualSurface: document.getElementById("manualSurface"),
+    manualSurfaceHex: document.getElementById("manualSurfaceHex"),
+    manualText: document.getElementById("manualText"),
+    manualTextHex: document.getElementById("manualTextHex"),
     // Features
     hideReactions: document.getElementById("hideReactions"),
     customTheme: document.getElementById("customTheme"),
@@ -118,6 +130,42 @@
     elements.saturationValue.textContent = (generator.saturationShift > 0 ? "+" : "") + generator.saturationShift;
     elements.lightnessRange.value = String(generator.lightnessShift);
     elements.lightnessValue.textContent = (generator.lightnessShift > 0 ? "+" : "") + generator.lightnessShift;
+
+    // Creation Mode
+    if (elements.creationModeControl) {
+      const modeSegments = elements.creationModeControl.querySelectorAll(".segment");
+      const modeIndicator = elements.creationModeControl.querySelector(".segment-indicator");
+      
+      modeSegments.forEach((seg) => {
+        if (seg.dataset.value === (generator.creationMode || "automatic")) {
+          seg.classList.add("active");
+          modeIndicator.style.width = seg.offsetWidth + "px";
+          modeIndicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+        } else {
+          seg.classList.remove("active");
+        }
+      });
+      
+      elements.automaticSettings.style.display = (generator.creationMode === "manual") ? "none" : "";
+      elements.manualSettings.style.display = (generator.creationMode === "manual") ? "" : "none";
+    }
+
+    if (generator.manualPalette) {
+      syncManualPaletteUi(generator.manualPalette);
+    }
+  }
+
+  function syncManualPaletteUi(palette) {
+    if (!palette || palette.length !== 4) return;
+    
+    elements.manualAccent.value = palette[0];
+    elements.manualAccentHex.value = palette[0];
+    elements.manualBg.value = palette[1];
+    elements.manualBgHex.value = palette[1];
+    elements.manualSurface.value = palette[2];
+    elements.manualSurfaceHex.value = palette[2];
+    elements.manualText.value = palette[3];
+    elements.manualTextHex.value = palette[3];
   }
 
   function syncFontUi(fontFamily) {
@@ -302,7 +350,7 @@
     } else {
       elements.backgroundPreview.style.backgroundImage = "";
       elements.backgroundPreview.classList.remove("has-image");
-      elements.backgroundLabel.textContent = "画像をドラッグまたは選択";
+      elements.backgroundLabel.textContent = "画像をドラッグまたは選択 (GIF対応)";
     }
   }
 
@@ -370,30 +418,40 @@
   function renderWithPreview(theme, background) {
     renderSwatches(getPreviewTheme(theme, background));
   }
-
   function readGeneratorFromUi() {
     const seed = engine.isHexColor(elements.seedHex.value)
       ? engine.normalizeHex(elements.seedHex.value)
       : elements.seedColor.value;
 
     return {
+      creationMode: settings.generator.creationMode || "automatic",
       seed: seed,
       mode: elements.modeSelect.value,
       saturationShift: Number(elements.saturationRange.value),
-      lightnessShift: Number(elements.lightnessRange.value)
+      lightnessShift: Number(elements.lightnessRange.value),
+      manualPalette: [
+        elements.manualAccent.value,
+        elements.manualBg.value,
+        elements.manualSurface.value,
+        elements.manualText.value
+      ]
     };
   }
 
   function getGeneratedTheme() {
     const generator = readGeneratorFromUi();
+    const theme = generator.creationMode === "manual"
+      ? engine.themeFromManualPalette(generator.manualPalette)
+      : engine.themeFromSeed(
+          generator.seed,
+          generator.mode,
+          generator.saturationShift,
+          generator.lightnessShift
+        );
+
     return {
       generator: generator,
-      theme: engine.themeFromSeed(
-        generator.seed,
-        generator.mode,
-        generator.saturationShift,
-        generator.lightnessShift
-      )
+      theme: theme
     };
   }
 
@@ -513,6 +571,57 @@
     });
     
     scheduleThemeAutoApply();
+  });
+
+  // Creation Mode Segmented Control logic
+  elements.creationModeControl.addEventListener("click", function (e) {
+    const btn = e.target.closest(".segment");
+    if (!btn) return;
+    
+    const value = btn.dataset.value;
+    settings.generator.creationMode = value;
+    
+    const segments = elements.creationModeControl.querySelectorAll(".segment");
+    const indicator = elements.creationModeControl.querySelector(".segment-indicator");
+    
+    segments.forEach((seg) => {
+      if (seg === btn) {
+        seg.classList.add("active");
+        indicator.style.width = seg.offsetWidth + "px";
+        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+      } else {
+        seg.classList.remove("active");
+      }
+    });
+    
+    elements.automaticSettings.style.display = (value === "manual") ? "none" : "";
+    elements.manualSettings.style.display = (value === "manual") ? "" : "none";
+    
+    scheduleThemeAutoApply();
+  });
+
+  // Manual Palette Listeners
+  [
+    { el: elements.manualAccent, hex: elements.manualAccentHex },
+    { el: elements.manualBg, hex: elements.manualBgHex },
+    { el: elements.manualSurface, hex: elements.manualSurfaceHex },
+    { el: elements.manualText, hex: elements.manualTextHex }
+  ].forEach(item => {
+    // Sync from color picker to hex input
+    item.el.addEventListener("input", function() {
+      item.hex.value = item.el.value;
+      scheduleThemeAutoApply();
+    });
+
+    // Sync from hex input to color picker
+    item.hex.addEventListener("input", function() {
+      const value = item.hex.value.trim();
+      if (engine.isHexColor(value)) {
+        const normalized = engine.normalizeHex(value);
+        item.el.value = normalized;
+        scheduleThemeAutoApply();
+      }
+    });
   });
 
   // Font Segmented Control logic (bundled fonts)

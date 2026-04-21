@@ -149,15 +149,6 @@ body {
   gap: 16px;
 }
 
-.hero-logo {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 8px 24px var(--accent-glow);
-  border: 1px solid var(--border-strong);
-  background: white;
-  padding: 4px;
-}
 
 .eyebrow {
   font-size: 11px;
@@ -454,6 +445,13 @@ h2 svg {
   flex-direction: column;
   gap: 20px;
   margin-bottom: 24px;
+}
+
+#automaticSettings,
+#manualSettings {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* Fields */
@@ -1051,4 +1049,34 @@ input[type="range"]::-webkit-slider-thumb {
   .sliders-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Manual Palette Grid */
+.manual-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.color-picker-modern.mini {
+  gap: 8px;
+  padding: 6px 10px;
+}
+
+.color-picker-modern.mini .color-preview-wrapper {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.manual-hex-input {
+  background: transparent;
+  border: none;
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  width: 100%;
+  text-transform: uppercase;
+  outline: none;
 }

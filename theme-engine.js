@@ -394,7 +394,67 @@
       "neutral-700": hslToHex(hsl.h, neutralSaturation, neutralSteps[7]),
       "neutral-800": hslToHex(hsl.h, neutralSaturation, neutralSteps[8]),
       "neutral-900": hslToHex(hsl.h, neutralSaturation, neutralSteps[9]),
-      "neutral-950": hslToHex(hsl.h, neutralSaturation, neutralSteps[10])
+    };
+  }
+
+  function themeFromManualPalette(palette) {
+    if (!Array.isArray(palette) || palette.length !== 4) {
+      return Object.assign({}, defaultTheme);
+    }
+
+    const accent = normalizeHex(palette[0]);
+    const bg = normalizeHex(palette[1]);
+    const card = normalizeHex(palette[2]);
+    const text = normalizeHex(palette[3]);
+
+    const accentHsl = rgbToHsl.apply(null, Object.values(hexToRgb(accent)));
+    const bgHsl = rgbToHsl.apply(null, Object.values(hexToRgb(bg)));
+    const cardHsl = rgbToHsl.apply(null, Object.values(hexToRgb(card)));
+    const textHsl = rgbToHsl.apply(null, Object.values(hexToRgb(text)));
+
+    const isDark = bgHsl.l < 50;
+
+    // Derive secondary colors
+    const textSecondary = hslToHex(textHsl.h, textHsl.s, isDark ? clamp(textHsl.l - 10, 0, 100) : clamp(textHsl.l + 12, 0, 100));
+    const textMuted = hslToHex(textHsl.h, textHsl.s, isDark ? clamp(textHsl.l - 20, 0, 100) : clamp(textHsl.l + 24, 0, 100));
+
+    const elevated = hslToHex(cardHsl.h, cardHsl.s, isDark ? clamp(cardHsl.l - 2, 0, 100) : clamp(cardHsl.l - 2, 0, 100));
+    const soft = hslToHex(cardHsl.h, cardHsl.s, isDark ? clamp(cardHsl.l + 5, 0, 100) : clamp(cardHsl.l - 7, 0, 100));
+
+    const borderAlpha = isDark ? 0.3 : 0.1;
+    const accentAlpha = isDark ? 0.18 : 0.08;
+
+    const neutralSteps = isDark
+      ? [16, 22, 30, 40, 52, 62, 72, 82, 26, 18, 12]
+      : [96, 92, 88, 80, 68, 56, 44, 32, 22, 14, 8];
+
+    return {
+      "app-bg": bg,
+      "surface-card": card,
+      "surface-elevated": elevated,
+      "surface-soft": soft,
+      "text-primary": text,
+      "text-secondary": textSecondary,
+      "text-muted": textMuted,
+      "border-soft": "hsla(" + Math.round(bgHsl.h) + "," + Math.round(clamp(bgHsl.s, 0, 30)) + "%," +
+        (isDark ? 72 : 38) + "%," + borderAlpha + ")",
+      "accent": accent,
+      "accent-soft": "hsla(" + Math.round(accentHsl.h) + "," + Math.round(accentHsl.s) + "%," +
+        Math.round(accentHsl.l) + "%," + accentAlpha + ")",
+      "link-accent": accent,
+      "link-accent-hover": hslToHex(accentHsl.h, accentHsl.s, isDark ? clamp(accentHsl.l + 10, 0, 100) : clamp(accentHsl.l - 10, 0, 100)),
+      "surface-shadow": isDark ? "0 24px 55px rgba(0, 0, 0, .35)" : "0 18px 38px rgba(16, 33, 50, .08)",
+      "neutral-50": hslToHex(bgHsl.h, clamp(bgHsl.s, 0, 20), neutralSteps[0]),
+      "neutral-100": hslToHex(bgHsl.h, clamp(bgHsl.s, 0, 20), neutralSteps[1]),
+      "neutral-200": hslToHex(bgHsl.h, clamp(bgHsl.s, 0, 20), neutralSteps[2]),
+      "neutral-300": hslToHex(bgHsl.h, clamp(bgHsl.s, 0, 20), neutralSteps[3]),
+      "neutral-400": hslToHex(bgHsl.h, clamp(bgHsl.s, 0, 20), neutralSteps[4]),
+      "neutral-500": hslToHex(bgHsl.h, clamp(bgHsl.s, 0, 20), neutralSteps[5]),
+      "neutral-600": hslToHex(bgHsl.h, clamp(bgHsl.s, 0, 20), neutralSteps[6]),
+      "neutral-700": hslToHex(bgHsl.h, clamp(bgHsl.s, 0, 20), neutralSteps[7]),
+      "neutral-800": hslToHex(bgHsl.h, clamp(bgHsl.s, 0, 20), neutralSteps[8]),
+      "neutral-900": hslToHex(bgHsl.h, clamp(bgHsl.s, 0, 20), neutralSteps[9]),
+      "neutral-950": hslToHex(bgHsl.h, clamp(bgHsl.s, 0, 20), neutralSteps[10])
     };
   }
 
@@ -628,12 +688,22 @@
   function buildAppliedCss(settings) {
     const source = settings && typeof settings === "object" ? settings : {};
     const features = source.features || {};
+    const googleFont = source.googleFont || {};
+    const generator = source.generator || {};
+    const creationMode = generator.creationMode || "automatic";
     const background = source.background && typeof source.background === "object" ? source.background : null;
     const fontFamily = source.fontFamily || "system";
     const fontSource = source.fontSource || "system";
     const customFont = source.customFont || {};
-    const googleFont = source.googleFont || {};
-    const appliedTheme = buildBackgroundTheme(source.theme, background);
+
+    let theme = source.theme;
+    if (creationMode === "manual" && generator.manualPalette) {
+      theme = themeFromManualPalette(generator.manualPalette);
+    } else if (creationMode === "automatic") {
+      theme = themeFromSeed(generator.seed, generator.mode, generator.saturationShift, generator.lightnessShift);
+    }
+
+    const appliedTheme = buildBackgroundTheme(theme, background);
 
     const parts = [];
 
@@ -712,6 +782,7 @@
     relativeLuminance: relativeLuminance,
     contrastRatio: contrastRatio,
     themeFromSeed: themeFromSeed,
+    themeFromManualPalette: themeFromManualPalette,
     autoFixTextContrast: autoFixTextContrast,
     sanitizeTheme: sanitizeTheme,
     buildBackgroundTheme: buildBackgroundTheme,
