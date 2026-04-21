@@ -59,6 +59,13 @@
 > GitHub の画面右上にある緑色の「Code ＞ Download ZIP」ではなく、必ず **[GitHub Releases](https://github.com/NamiCode-Dev/Karotter-Studio/releases)** から最新バージョンの ZIP ファイルをダウンロードしてください。（Code からのダウンロードでは、一部のファイルが不足したり動作しなかったりする場合があります）
 
 ### Google Chrome
+Chrome には 2 通りのインストール方法があります。
+
+#### 1. ストアからインストール（推奨）
+公式の Chrome ウェブストアから直接インストールできます。自動更新が適用されるため、こちらを推奨します。
+- **[Chrome ウェブストアで入手](https://chromewebstore.google.com/detail/karotter-studio/kjhhkkihmpfkhaffccmcilmocopkphgf?hl=ja)**
+
+#### 2. ファイルから手動でインストール（開発者向け）
 1. [GitHub Releases](https://github.com/NamiCode-Dev/Karotter-Studio/releases) から最新の ZIP ファイルをダウンロードして解凍してください。
 2. Chrome で `chrome://extensions` を開きます。
 3. 右上の「**デベロッパー モード**」をオンにします。

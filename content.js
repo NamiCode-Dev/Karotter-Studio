@@ -3,7 +3,7 @@
   const storage = window.KarotterThemeStorage;
   const STYLE_ID = "karotter-custom-theme-style";
   const FEATURE_STYLE_ID = "karotter-feature-enhancements";
-  const COLLAPSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; stroke: var(--neutral-500) !important;" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>`;
+  const COLLAPSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; stroke: var(--neutral-500) !important;" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>`;
   let collapseInterval = null;
   let spoilerInterval = null;
   let autoExpandInterval = null;
@@ -27,6 +27,7 @@
   const ADVANCED_SEARCH_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-2"><path d="M14 17H5"/><path d="M19 7h-9"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>`;
   const BOARDS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-right w-5 h-5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/></svg>`;
   const GLOSSARY_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text w-5 h-5"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg>`;
+  const REACTION_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smile-plus"><path d="M22 11v1a10 10 0 1 1-9-10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/><path d="M16 5h6"/><path d="M19 2v6"/></svg>`;
 
   function ensureStyleElement() {
     let style = document.getElementById(STYLE_ID);
@@ -337,6 +338,35 @@
     setupVBotCommands(features.enableVBotCommands);
     setupHideReplies(features.hideReplies);
     setupUserProfileLinks(features.enableUserProfileLinks);
+    setupReactionIcons(!features.hideReactions);
+  }
+
+  let reactionIconsInterval = null;
+  function setupReactionIcons(enabled) {
+    if (reactionIconsInterval) {
+      clearInterval(reactionIconsInterval);
+      reactionIconsInterval = null;
+    }
+
+    if (!enabled) return;
+
+    reactionIconsInterval = setInterval(() => {
+      // Find reaction buttons (the ones that add a reaction)
+      // They are usually in the same container that we hide
+      const containers = document.querySelectorAll('div.mt-3.flex.flex-wrap.items-center.gap-2');
+      containers.forEach(container => {
+        // The "Add reaction" button is typically the last or one with a specific icon
+        // We look for a button that has an SVG inside but is not an emoji reaction
+        const buttons = container.querySelectorAll('button:not([data-karotter-reaction-fixed])');
+        buttons.forEach(btn => {
+          const svg = btn.querySelector('svg');
+          if (svg && !btn.querySelector('img')) { // Likely an action button, not an emoji
+            btn.setAttribute('data-karotter-reaction-fixed', 'true');
+            svg.outerHTML = REACTION_SVG;
+          }
+        });
+      });
+    }, 200);
   }
 
   function setupHideReplies(enabled) {

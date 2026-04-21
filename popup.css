@@ -140,7 +140,23 @@ body {
 .hero-top {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+}
+
+.hero-id {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hero-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px var(--accent-glow);
+  border: 1px solid var(--border-strong);
+  background: white;
+  padding: 4px;
 }
 
 .eyebrow {

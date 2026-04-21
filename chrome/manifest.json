@@ -1,0 +1,82 @@
+{
+  "manifest_version": 3,
+  "name": "Karotter Studio",
+  "version": "1.6.0",
+  "description": "Karotterをより快適に。より柔軟にカスタマイズ。",
+  "author": "NamiCode",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "karotter-studio@nami-code.dev",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  },
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "sidePanel",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://karotter.com/*",
+    "https://*.karotter.com/*",
+    "https://karotter.jp/*",
+    "https://*.karotter.jp/*",
+    "https://karotter.karon.jp/*",
+    "https://*.karotter.karon.jp/*",
+    "https://apikarotter.karon.jp/*",
+    "https://*.apikarotter.karon.jp/*"
+  ],
+  "action": {
+    "default_title": "Karotter Studio",
+    "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://karotter.com/*",
+        "https://*.karotter.com/*",
+        "https://karotter.jp/*",
+        "https://*.karotter.jp/*",
+        "https://karotter.karon.jp/*",
+        "https://*.karotter.karon.jp/*",
+        "https://apikarotter.karon.jp/*",
+        "https://*.apikarotter.karon.jp/*"
+      ],
+      "js": [
+        "theme-engine.js",
+        "storage.js",
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "font/*.otf",
+        "font/*.ttf"
+      ],
+      "matches": [
+        "https://karotter.com/*",
+        "https://*.karotter.com/*",
+        "https://karotter.jp/*",
+        "https://*.karotter.jp/*",
+        "https://karotter.karon.jp/*",
+        "https://*.karotter.karon.jp/*",
+        "https://apikarotter.karon.jp/*",
+        "https://*.apikarotter.karon.jp/*"
+      ]
+    }
+  ]
+}
