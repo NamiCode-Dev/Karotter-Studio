@@ -15,6 +15,7 @@
     saturationValue: document.getElementById("saturationValue"),
     lightnessRange: document.getElementById("lightnessRange"),
     lightnessValue: document.getElementById("lightnessValue"),
+    extractColorBtn: document.getElementById("extractColorBtn"),
     backgroundToggle: document.getElementById("backgroundToggle"),
     backgroundHelp: document.getElementById("backgroundHelp"),
     backgroundInput: document.getElementById("backgroundInput"),
@@ -61,6 +62,7 @@
     enableAdvancedSearch: document.getElementById("enableAdvancedSearch"),
     showBoardsLink: document.getElementById("showBoardsLink"),
     enableVBotCommands: document.getElementById("enableVBotCommands"),
+    enableYandereBotAssistant: document.getElementById("enableYandereBotAssistant"),
     hideReplies: document.getElementById("hideReplies"),
     enableUserProfileLinks: document.getElementById("enableUserProfileLinks"),
     showGlossaryLink: document.getElementById("showGlossaryLink"),
@@ -352,6 +354,10 @@
       elements.backgroundPreview.classList.remove("has-image");
       elements.backgroundLabel.textContent = "画像をドラッグまたは選択 (GIF対応)";
     }
+
+    if (elements.extractColorBtn) {
+      elements.extractColorBtn.disabled = !isBackgroundActive;
+    }
   }
 
   function renderFeaturesUi() {
@@ -376,6 +382,7 @@
     elements.enableAdvancedSearch.checked = settings.features.enableAdvancedSearch;
     elements.showBoardsLink.checked = settings.features.showBoardsLink;
     elements.enableVBotCommands.checked = settings.features.enableVBotCommands;
+    elements.enableYandereBotAssistant.checked = settings.features.enableYandereBotAssistant;
     elements.hideReplies.checked = settings.features.hideReplies;
     elements.enableUserProfileLinks.checked = settings.features.enableUserProfileLinks;
     elements.showGlossaryLink.checked = settings.features.showGlossaryLink;
@@ -535,7 +542,51 @@
     });
   }
 
+  function extractDominantColor(dataUrl) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        // Scale down for performance
+        canvas.width = 50;
+        canvas.height = 50;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let r = 0, g = 0, b = 0, count = 0;
+        
+        for (let i = 0; i < data.length; i += 4) {
+          // Skip transparent or very light/dark pixels if necessary, 
+          // but for simple extraction average is often enough for a base color
+          r += data[i];
+          g += data[i + 1];
+          b += data[i + 2];
+          count++;
+        }
+        
+        r = Math.floor(r / count);
+        g = Math.floor(g / count);
+        b = Math.floor(b / count);
+        
+        resolve(engine.rgbToHex(r, g, b));
+      };
+      img.src = dataUrl;
+    });
+  }
+
   // Event Listeners
+  if (elements.extractColorBtn) {
+    elements.extractColorBtn.addEventListener("click", async function () {
+      if (!settings.background || !settings.background.imageDataUrl) return;
+      
+      const color = await extractDominantColor(settings.background.imageDataUrl);
+      elements.seedHex.value = color;
+      elements.seedColor.value = color;
+      scheduleThemeAutoApply();
+    });
+  }
+
   elements.seedColor.addEventListener("input", function () {
     elements.seedHex.value = elements.seedColor.value;
     scheduleThemeAutoApply();
@@ -912,7 +963,7 @@
   });
 
   // Feature Toggles
-  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch", "showBoardsLink", "enableVBotCommands", "hideReplies", "enableUserProfileLinks", "showGlossaryLink", "enableModernLinkPreview"].forEach(featureKey => {
+  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch", "showBoardsLink", "enableVBotCommands", "enableYandereBotAssistant", "hideReplies", "enableUserProfileLinks", "showGlossaryLink", "enableModernLinkPreview"].forEach(featureKey => {
     const el = elements[featureKey];
     if (el) {
       el.addEventListener("change", function () {
@@ -1037,7 +1088,7 @@
   });
 
   elements.openSiteBtn.addEventListener("click", function () {
-    chrome.tabs.create({ url: "https://karotter.com/" });
+    chrome.tabs.create({ url: "https://karotter.com/profile/namicode" });
     window.close();
   });
 

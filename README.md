@@ -127,7 +127,10 @@ Firefox には 2 通りのインストール方法があります。
 
 本拡張機能では、以下のオープンソースソフトウェアおよび資産を使用しています。開発者の皆様に感謝いたします。
 
-- **[Lucide Icons](https://lucide.dev/)**: [ISC License](https://github.com/lucide-icons/lucide/blob/main/LICENSE) - UIアイコンとして使用。
+- **Credits**:
+  - This product uses [Lucide Icons](https://lucide.dev/).
+  - Lucide Icons © Lucide Contributors, licensed under the [ISC License](https://github.com/lucide-icons/lucide/blob/main/LICENSE).
+  - Some icons are derived from [Feather](https://feathericons.com/) © Cole Bemis, licensed under the [MIT License](https://github.com/feathericons/feather/blob/master/LICENSE).
 
 ---
 

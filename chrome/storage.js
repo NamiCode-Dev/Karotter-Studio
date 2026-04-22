@@ -14,10 +14,12 @@
         surfaceOpacity: 100
       },
       generator: {
+        creationMode: "automatic",
         seed: "#1d9bf0",
         mode: "light",
         saturationShift: 0,
-        lightnessShift: 0
+        lightnessShift: 0,
+        manualPalette: ["#1d9bf0", "#f0f3f5", "#ffffff", "#0f1419"]
       },
       features: {
         customTheme: true,
@@ -39,6 +41,7 @@
         enableAdvancedSearch: false,
         showBoardsLink: false,
         enableVBotCommands: false,
+        enableYandereBotAssistant: true,
         hideReplies: false,
         enableUserProfileLinks: false,
         showGlossaryLink: false,
@@ -63,10 +66,14 @@
   function normalizeGenerator(input) {
     const generator = input && typeof input === "object" ? input : {};
     return {
+      creationMode: ["automatic", "manual"].includes(generator.creationMode) ? generator.creationMode : "automatic",
       seed: engine.isHexColor(generator.seed) ? engine.normalizeHex(generator.seed) : "#1d9bf0",
       mode: engine.generatorModes.includes(generator.mode) ? generator.mode : "light",
       saturationShift: engine.clamp(Number(generator.saturationShift) || 0, -40, 40),
-      lightnessShift: engine.clamp(Number(generator.lightnessShift) || 0, -30, 30)
+      lightnessShift: engine.clamp(Number(generator.lightnessShift) || 0, -30, 30),
+      manualPalette: Array.isArray(generator.manualPalette) && generator.manualPalette.length === 4
+        ? generator.manualPalette.map(c => engine.isHexColor(c) ? engine.normalizeHex(c) : "#000000")
+        : ["#1d9bf0", "#f0f3f5", "#ffffff", "#0f1419"]
     };
   }
 
@@ -107,6 +114,7 @@
       enableAdvancedSearch: !!f.enableAdvancedSearch,
       showBoardsLink: !!f.showBoardsLink,
       enableVBotCommands: !!f.enableVBotCommands,
+      enableYandereBotAssistant: f.enableYandereBotAssistant !== undefined ? !!f.enableYandereBotAssistant : true,
       hideReplies: !!f.hideReplies,
       enableUserProfileLinks: !!f.enableUserProfileLinks,
       showGlossaryLink: !!f.showGlossaryLink,

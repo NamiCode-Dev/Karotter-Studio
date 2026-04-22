@@ -855,7 +855,7 @@
   });
 
   elements.openSiteBtn.addEventListener("click", function () {
-    chrome.tabs.create({ url: "https://karotter.com/" });
+    chrome.tabs.create({ url: "https://karotter.com/profile/namicode" });
     window.close();
   });
 

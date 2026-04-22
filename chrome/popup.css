@@ -27,6 +27,7 @@
   --radius-lg: 20px;
   --radius-md: 14px;
   --radius-sm: 10px;
+  --accent-gradient: linear-gradient(135deg, #1d9bf0 0%, #00ba7c 100%);
   --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, "Hiragino Sans", "Yu Gothic UI", sans-serif;
   color-scheme: light;
 }
@@ -751,6 +752,81 @@ input[type="range"]::-webkit-slider-thumb {
 .btn-ghost:hover {
   color: var(--text);
   background: var(--surface);
+}
+
+/* Footer */
+.studio-footer {
+  margin-top: auto;
+  padding: 32px 0 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.studio-footer::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 99px;
+  opacity: 0.5;
+}
+
+#openSiteBtn {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  background: var(--accent-gradient);
+  color: white;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 24px rgba(29, 155, 240, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+#openSiteBtn::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+#openSiteBtn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(29, 155, 240, 0.5);
+}
+
+#openSiteBtn:hover::after {
+  opacity: 1;
+}
+
+#openSiteBtn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 4px 12px rgba(29, 155, 240, 0.4);
+}
+
+#openSiteBtn svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#openSiteBtn:hover svg {
+  transform: rotate(12deg) scale(1.2);
 }
 
 .btn-danger {

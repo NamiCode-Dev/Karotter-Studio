@@ -21,6 +21,11 @@
   let vbotAttachedTextarea = null;
   let vbotSelectedIndex = 0;
   let vbotFilteredCommands = [];
+  let yandereInterval = null;
+  let yandereCard = null;
+  let yandereAttachedTextarea = null;
+  let yandereSelectedIndex = 0;
+  let yandereFilteredCommands = [];
 
   // Icons are from Lucide Icons (ISC License: https://lucide.dev/)
   const DOWNLOAD_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>`;
@@ -336,6 +341,7 @@
     setupGlossaryLink(features.showGlossaryLink);
     setupModernLinkPreview(features.enableModernLinkPreview);
     setupVBotCommands(features.enableVBotCommands);
+    setupYandereBotCommands(features.enableYandereBotAssistant);
     setupHideReplies(features.hideReplies);
     setupUserProfileLinks(features.enableUserProfileLinks);
     setupReactionIcons(!features.hideReactions);
@@ -1387,24 +1393,266 @@
     }
 
     vbotInterval = setInterval(() => {
-      const textarea = document.querySelector('textarea[placeholder="いまどうしてる？"]');
-      if (!textarea) {
-        hideVBotCard();
+      const textareas = document.querySelectorAll('textarea[placeholder="いまどうしてる？"], textarea[placeholder="メッセージ..."]');
+      textareas.forEach(textarea => {
+        if (!textarea.dataset.vbotAttached) {
+          textarea.addEventListener('input', (e) => {
+            vbotAttachedTextarea = e.target;
+            handleVBotInput(e);
+          });
+          textarea.addEventListener('keydown', (e) => {
+            vbotAttachedTextarea = e.target;
+            handleVBotKeyDown(e);
+          });
+          textarea.addEventListener('blur', handleVBotBlur);
+          textarea.dataset.vbotAttached = 'true';
+        }
+      });
+    }, 500);
+  }
+
+  function isHigh28BotDM() {
+    const headers = document.querySelectorAll('div.border-b');
+    for (const header of headers) {
+      const link = header.querySelector('a[href]');
+      if (!link) continue;
+      const href = link.getAttribute('href');
+      const text = header.textContent || '';
+      if (href === '/profile/high28bot' && text.includes('ヤンデレちゃん♡BOT')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function handleYandereInput(e) {
+    const textarea = e.target;
+    const text = textarea.value;
+    const cursorPos = textarea.selectionStart;
+
+    const lastAtPos = text.lastIndexOf('!', cursorPos);
+    if (lastAtPos === -1 || (lastAtPos > 0 && text[lastAtPos - 1] !== ' ' && text[lastAtPos - 1] !== '\n')) {
+      hideYandereCard();
+      return;
+    }
+
+    const query = text.substring(lastAtPos, cursorPos).trim().toLowerCase();
+    if (!query.startsWith('!')) {
+      hideYandereCard();
+      return;
+    }
+
+    yandereFilteredCommands = YANDERE_COMMAND_DATA.filter(c => c.cmd.toLowerCase().includes(query) || query === "!");
+
+    if (yandereFilteredCommands.length === 0) {
+      hideYandereCard();
+      return;
+    }
+
+    showYandereCard(textarea, lastAtPos, query);
+  }
+
+  function handleYandereKeyDown(e) {
+    if (!yandereCard || yandereCard.style.display === 'none') return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      yandereSelectedIndex = (yandereSelectedIndex + 1) % yandereFilteredCommands.length;
+      renderYandereCommands();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      yandereSelectedIndex = (yandereSelectedIndex - 1 + yandereFilteredCommands.length) % yandereFilteredCommands.length;
+      renderYandereCommands();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      selectYandereCommand(yandereFilteredCommands[yandereSelectedIndex]);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      hideYandereCard();
+    }
+  }
+
+  function handleYandereBlur() {
+    setTimeout(hideYandereCard, 200);
+  }
+
+  function setupYandereBotCommands(enabled) {
+    if (yandereInterval) {
+      clearInterval(yandereInterval);
+      yandereInterval = null;
+    }
+
+    if (!enabled) {
+      hideYandereCard();
+      return;
+    }
+
+    yandereInterval = setInterval(() => {
+      if (!isHigh28BotDM()) {
+        hideYandereCard();
         return;
       }
 
-      if (vbotAttachedTextarea !== textarea) {
-        if (vbotAttachedTextarea) {
-          vbotAttachedTextarea.removeEventListener('input', handleVBotInput);
-          vbotAttachedTextarea.removeEventListener('keydown', handleVBotKeyDown);
-          vbotAttachedTextarea.removeEventListener('blur', handleVBotBlur);
+      const textareas = document.querySelectorAll('textarea[placeholder="メッセージ..."]');
+      textareas.forEach(textarea => {
+        if (!textarea.dataset.yandereAttached) {
+          textarea.addEventListener('input', (e) => {
+            yandereAttachedTextarea = e.target;
+            handleYandereInput(e);
+          });
+          textarea.addEventListener('keydown', (e) => {
+            yandereAttachedTextarea = e.target;
+            handleYandereKeyDown(e);
+          });
+          textarea.addEventListener('blur', handleYandereBlur);
+          textarea.dataset.yandereAttached = 'true';
         }
-        vbotAttachedTextarea = textarea;
-        vbotAttachedTextarea.addEventListener('input', handleVBotInput);
-        vbotAttachedTextarea.addEventListener('keydown', handleVBotKeyDown);
-        vbotAttachedTextarea.addEventListener('blur', handleVBotBlur);
+      });
+    }, 500);
+  }
+
+  function showYandereCard(textarea, atPos, query) {
+    if (!yandereCard) {
+      yandereCard = document.createElement('div');
+      yandereCard.id = 'yandere-assistant-card';
+      yandereCard.style.cssText = `
+        position: fixed;
+        width: 320px;
+        max-width: 90vw;
+        background: var(--surface-card, #fff);
+        border: 1px solid var(--border-soft, #eee);
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        z-index: 10000;
+        overflow: hidden;
+        display: none;
+        flex-direction: column;
+      `;
+
+      const header = document.createElement('div');
+      header.style.cssText = `
+        padding: 12px 16px;
+        background: var(--accent, #1d9bf0);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #fff;
+      `;
+      header.innerHTML = `
+        <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: white;">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 800; color: #fff;">ヤンデレちゃん♡BOT</div>
+          <div style="font-size: 10px; font-weight: 600; color: #fff; opacity: 0.8;">コマンドアシスタント</div>
+        </div>
+      `;
+      yandereCard.appendChild(header);
+
+      const list = document.createElement('div');
+      list.className = 'yandere-command-list';
+      list.style.cssText = `
+        max-height: 280px;
+        overflow-y: auto;
+        padding: 6px;
+      `;
+      yandereCard.appendChild(list);
+      document.body.appendChild(yandereCard);
+    }
+
+    const rect = textarea.getBoundingClientRect();
+    yandereCard.style.display = 'flex';
+    yandereCard.style.left = `${rect.left}px`;
+    yandereCard.style.bottom = `${window.innerHeight - rect.top + 8}px`;
+
+    yandereSelectedIndex = 0;
+    renderYandereCommands();
+  }
+
+  function renderYandereCommands() {
+    if (!yandereCard) return;
+    const list = yandereCard.querySelector('.yandere-command-list');
+    list.innerHTML = '';
+
+    let currentCat = null;
+
+    yandereFilteredCommands.forEach((cmd, index) => {
+      if (cmd.cat !== currentCat) {
+        currentCat = cmd.cat;
+        const catHeader = document.createElement('div');
+        catHeader.style.cssText = `
+          padding: 8px 10px 4px;
+          font-size: 10px;
+          font-weight: 800;
+          color: var(--text-faint);
+          text-transform: uppercase;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          opacity: 0.8;
+        `;
+        catHeader.innerHTML = `${cmd.catIcon} <span>${cmd.cat}</span>`;
+        list.appendChild(catHeader);
       }
-    }, 100);
+
+      const item = document.createElement('div');
+      item.style.cssText = `
+        padding: 10px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: .2s;
+        background: ${index === yandereSelectedIndex ? 'var(--accent-soft, rgba(29, 155, 240, 0.1))' : 'transparent'};
+      `;
+
+      item.innerHTML = `
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: ${index === yandereSelectedIndex ? 'var(--accent)' : 'var(--surface-hover)'}; display: flex; align-items: center; justify-content: center; color: ${index === yandereSelectedIndex ? '#fff' : 'var(--text-dim)'}; transition: .2s;">
+          ${cmd.icon}
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 13px; font-weight: 700; color: ${index === yandereSelectedIndex ? 'var(--accent)' : 'var(--text-primary)'};">${cmd.cmd}</div>
+          <div style="font-size: 11px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${cmd.desc}</div>
+        </div>
+      `;
+
+      item.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        selectYandereCommand(cmd);
+      };
+      list.appendChild(item);
+
+      if (index === yandereSelectedIndex) {
+        item.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }
+
+  function selectYandereCommand(cmd) {
+    if (!yandereAttachedTextarea) return;
+    const text = yandereAttachedTextarea.value;
+    const cursorPos = yandereAttachedTextarea.selectionStart;
+    const lastAtPos = text.lastIndexOf('!', cursorPos);
+
+    if (lastAtPos !== -1) {
+      const before = text.substring(0, lastAtPos);
+      const after = text.substring(cursorPos);
+      yandereAttachedTextarea.value = before + cmd.cmd + " " + after;
+      yandereAttachedTextarea.focus();
+      const newPos = lastAtPos + cmd.cmd.length + 1;
+      yandereAttachedTextarea.setSelectionRange(newPos, newPos);
+      yandereAttachedTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    hideYandereCard();
+  }
+
+  function hideYandereCard() {
+    if (yandereCard) {
+      yandereCard.style.display = 'none';
+    }
   }
 
   const VBOT_COMMAND_DATA = [
@@ -1426,6 +1674,16 @@
     { cat: "ランキング", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/></svg>`, cmd: "ranking followers", desc: "フォロワー数ランキングを表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>` },
     { cat: "ランキング", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/></svg>`, cmd: "ranking rate", desc: "評価ランキングを表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>` },
     { cat: "ランキング", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/></svg>`, cmd: "ranking posts", desc: "投稿数ランキングを表示します。", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>` }
+  ];
+
+  const YANDERE_COMMAND_DATA = [
+    { cat: "遊び系", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-5a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01"/><path d="M10 14h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>`, cmd: "!dice", desc: "サイコロを振ります（例: !dice 1d20）", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-5a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01"/><path d="M10 14h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>` },
+    { cat: "遊び系", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-5a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01"/><path d="M10 14h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>`, cmd: "!8ball", desc: "8ボール占いをします", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>` },
+    { cat: "遊び系", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-5a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01"/><path d="M10 14h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>`, cmd: "!omikuji", desc: "おみくじを引きます", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M13.744 17.736a6 6 0 1 1-7.48-7.48"/><path d="M15 6h1v4"/><path d="m6.134 14.768.866-.5 2 3.464"/><circle cx="16" cy="8" r="6"/></svg>` },
+    { cat: "遊び系", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-5a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01"/><path d="M10 14h.01"/><path d="M15 6h.01"/><path d="M18 9h.01"/></svg>`, cmd: "!janken", desc: "じゃんけんで勝負します", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>` },
+    { cat: "占い系", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>`, cmd: "!love", desc: "相性占いをします", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>` },
+    { cat: "占い系", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>`, cmd: "!fortune", desc: "今日の運勢をAI生成で表示します", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>` },
+    { cat: "画像系", catIcon: `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`, cmd: "!image", desc: "指定カテゴリのアニメ画像を送信します", icon: `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>` }
   ];
 
   function handleVBotInput(e) {
@@ -1492,61 +1750,37 @@
         overflow: hidden;
         display: none;
         flex-direction: column;
-        touch-action: manipulation;
       `;
 
       const header = document.createElement('div');
       header.style.cssText = `
         padding: 12px 16px;
         background: var(--accent, #1d9bf0);
-        color: #fff;
-        font-weight: 800;
-        font-size: 13px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
         display: flex;
         align-items: center;
-        gap: 8px;
-        min-height: 44px;
+        gap: 10px;
+        color: #fff;
       `;
-      header.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>`);
-      const headerTitle = document.createElement('span');
-      headerTitle.textContent = 'vbot コマンド一覧';
-      header.appendChild(headerTitle);
+      header.innerHTML = `
+        <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: white;">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+        </div>
+        <div>
+          <div style="font-size: 13px; font-weight: 800; color: #fff;">VBot Assistant</div>
+          <div style="font-size: 10px; font-weight: 600; color: #fff; opacity: 0.8;">コマンドアシスタント</div>
+        </div>
+      `;
       vbotCard.appendChild(header);
 
       const list = document.createElement('div');
       list.id = 'vbot-command-list';
       list.style.cssText = `
-        max-height: 300px;
+        max-height: 280px;
         overflow-y: auto;
-        padding: 8px 0;
-        -webkit-overflow-scrolling: touch;
+        padding: 6px;
       `;
       vbotCard.appendChild(list);
-
-      const footer = document.createElement('div');
-      footer.id = 'vbot-assistant-footer';
-      footer.style.cssText = `
-        padding: 8px 16px;
-        border-top: 1px solid var(--border-soft, #eee);
-        font-size: 10px;
-        color: var(--text-faint, #888);
-        background: var(--bg-subtle, #f9f9f9);
-      `;
-      const footerHelp = document.createElement('span');
-      footerHelp.className = 'vbot-desktop-help';
-      footerHelp.textContent = '↑↓ で選択 • Enter で決定 • Esc で閉じる';
-      footer.appendChild(footerHelp);
-      vbotCard.appendChild(footer);
-
-      // Add responsive style for the footer
-      const styleTag = document.createElement('style');
-      styleTag.textContent = `
-        @media (max-width: 768px) {
-          #vbot-assistant-footer { display: none !important; }
-        }
-      `;
-      document.head.appendChild(styleTag);
-
       document.body.appendChild(vbotCard);
     }
 
@@ -1583,79 +1817,60 @@
   }
 
   function renderVBotCommands() {
+    if (!vbotCard) return;
     const list = vbotCard.querySelector('#vbot-command-list');
     list.innerHTML = '';
 
-    let lastCat = null;
-    vbotFilteredCommands.forEach((c, index) => {
-      if (c.cat !== lastCat) {
-        const cat = document.createElement('div');
-        cat.style.cssText = `
-          padding: 12px 16px 4px;
+    let currentCat = null;
+    vbotFilteredCommands.forEach((cmd, index) => {
+      if (cmd.cat !== currentCat) {
+        currentCat = cmd.cat;
+        const catHeader = document.createElement('div');
+        catHeader.style.cssText = `
+          padding: 8px 10px 4px;
           font-size: 10px;
           font-weight: 800;
-          color: var(--accent, #1d9bf0);
+          color: var(--text-faint);
           text-transform: uppercase;
-          letter-spacing: 0.05em;
           display: flex;
           align-items: center;
           gap: 6px;
+          opacity: 0.8;
         `;
-        const catIconSpan = document.createElement('span');
-        catIconSpan.style.cssText = 'display: flex; align-items: center; opacity: 0.8;';
-        catIconSpan.insertAdjacentHTML('afterbegin', c.catIcon);
-        
-        const catNameSpan = document.createElement('span');
-        catNameSpan.textContent = c.cat;
-        
-        cat.appendChild(catIconSpan);
-        cat.appendChild(catNameSpan);
-        list.appendChild(cat);
-        lastCat = c.cat;
+        catHeader.innerHTML = `${cmd.catIcon} <span>${cmd.cat}</span>`;
+        list.appendChild(catHeader);
       }
 
       const item = document.createElement('div');
-      const isActive = index === vbotSelectedIndex;
       item.style.cssText = `
-        padding: 10px 16px;
+        padding: 10px 12px;
+        border-radius: 8px;
         cursor: pointer;
         display: flex;
         align-items: center;
         gap: 12px;
-        background: ${isActive ? 'var(--accent-soft, #eef8ff)' : 'transparent'};
-        border-left: 3px solid ${isActive ? 'var(--accent, #1d9bf0)' : 'transparent'};
-        min-height: 48px;
-        user-select: none;
+        transition: .2s;
+        background: ${index === vbotSelectedIndex ? 'var(--accent-soft, rgba(29, 155, 240, 0.1))' : 'transparent'};
       `;
-      const iconDiv = document.createElement('div');
-      iconDiv.style.cssText = `flex-shrink: 0; color: ${isActive ? 'var(--accent, #1d9bf0)' : 'var(--text-dim, #888)'}`;
-      iconDiv.insertAdjacentHTML('afterbegin', c.icon);
-      
-      const textWrap = document.createElement('div');
-      textWrap.style.cssText = 'display: flex; flex-direction: column; gap: 2px;';
-      
-      const cmdDiv = document.createElement('div');
-      cmdDiv.style.cssText = `font-weight: 700; font-size: 13px; color: ${isActive ? 'var(--accent, #1d9bf0)' : 'var(--text-primary, #000)'}`;
-      cmdDiv.textContent = `@vbot ${c.cmd}`;
-      
-      const descDiv = document.createElement('div');
-      descDiv.style.cssText = 'font-size: 11px; color: var(--text-dim, #666)';
-      descDiv.textContent = c.desc;
-      
-      textWrap.appendChild(cmdDiv);
-      textWrap.appendChild(descDiv);
-      
-      item.appendChild(iconDiv);
-      item.appendChild(textWrap);
+
+      item.innerHTML = `
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: ${index === vbotSelectedIndex ? 'var(--accent)' : 'var(--surface-hover)'}; display: flex; align-items: center; justify-content: center; color: ${index === vbotSelectedIndex ? '#fff' : 'var(--text-dim)'}; transition: .2s;">
+          ${cmd.icon}
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 13px; font-weight: 700; color: ${index === vbotSelectedIndex ? 'var(--accent)' : 'var(--text-primary)'};">${cmd.cmd}</div>
+          <div style="font-size: 11px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${cmd.desc}</div>
+        </div>
+      `;
 
       item.onclick = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        selectVBotCommand(c);
+        selectVBotCommand(cmd);
       };
-
       list.appendChild(item);
-      if (isActive) {
+
+      if (index === vbotSelectedIndex) {
         item.scrollIntoView({ block: 'nearest' });
       }
     });
