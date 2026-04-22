@@ -357,12 +357,16 @@
     if (!enabled) return;
 
     reactionIconsInterval = setInterval(() => {
+      // Find reaction buttons (the ones that add a reaction)
+      // They are usually in the same container that we hide
       const containers = document.querySelectorAll('div.mt-3.flex.flex-wrap.items-center.gap-2');
       containers.forEach(container => {
+        // The "Add reaction" button is typically the last or one with a specific icon
+        // We look for a button that has an SVG inside but is not an emoji reaction
         const buttons = container.querySelectorAll('button:not([data-karotter-reaction-fixed])');
         buttons.forEach(btn => {
           const svg = btn.querySelector('svg');
-          if (svg && !btn.querySelector('img')) {
+          if (svg && !btn.querySelector('img')) { // Likely an action button, not an emoji
             btn.setAttribute('data-karotter-reaction-fixed', 'true');
             svg.outerHTML = REACTION_SVG;
           }
@@ -410,19 +414,24 @@
 
     if (!enabled) return;
 
+    // Use interval to handle both initial load and dynamic updates safely
     userProfileLinksInterval = setInterval(() => {
+      // Find articles that haven't been processed yet
       const articles = document.querySelectorAll('article');
       
       articles.forEach(article => {
+        // Target the post header using the specific classes
         const header = article.querySelector('div.mb-2.flex.flex-wrap.items-center.gap-2');
         if (!header) return;
 
+        // 1. Identify User ID
+        // Find a span that starts with '@' (the user identifier)
         const spans = header.querySelectorAll('span');
         let userId = null;
         for (const span of spans) {
           const text = span.textContent.trim();
           if (text.startsWith('@') && text.length > 1) {
-            userId = text.substring(1).split(' ')[0];
+            userId = text.substring(1).split(' ')[0]; // Handle cases where ID might be followed by other text
             break;
           }
         }
@@ -431,6 +440,8 @@
 
         const profileUrl = `${location.protocol}//${location.host}/profile/${userId}`;
 
+        // 2. Wrap Icon Image
+        // Selector matches the h-6 w-6 rounded icon
         const icon = header.querySelector('img.h-6.w-6.rounded-full.object-cover');
         if (icon && !icon.closest('a')) {
           const a = document.createElement('a');
@@ -441,6 +452,8 @@
           a.appendChild(icon);
         }
 
+        // 3. Wrap Username
+        // Selector matches the font-semibold text-primary span
         const username = header.querySelector('span.font-semibold');
         if (username && !username.closest('a') && username.textContent.trim().length > 0) {
           const a = document.createElement('a');
@@ -709,6 +722,7 @@
 
         const ui = document.createElement('div');
         ui.className = 'karotter-video-ui';
+        
         const centerPlay = document.createElement('div');
         centerPlay.className = 'karotter-video-center-play visible';
         centerPlay.insertAdjacentHTML('afterbegin', PLAY_ICON);
@@ -1191,7 +1205,7 @@
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'karotter-adv-search-btn';
-        btn.innerHTML = ADVANCED_SEARCH_SVG;
+        btn.insertAdjacentHTML('afterbegin', ADVANCED_SEARCH_SVG);
         btn.title = '高度な検索';
 
         btn.onclick = (e) => {
@@ -1227,7 +1241,6 @@
     modal.className = 'karotter-adv-search-modal';
     modal.onclick = (e) => e.stopPropagation();
 
-    modal.innerHTML = '';
     const header = document.createElement('div');
     header.className = 'karotter-adv-search-header';
     const title = document.createElement('h2');
@@ -1310,14 +1323,15 @@
 
     const footer = document.createElement('div');
     footer.className = 'karotter-adv-search-footer';
-    const modalSubmitBtn = document.createElement('button');
-    modalSubmitBtn.className = 'karotter-adv-search-submit';
-    modalSubmitBtn.textContent = '検索';
-    footer.appendChild(modalSubmitBtn);
+    const submitBtn = document.createElement('button');
+    submitBtn.className = 'karotter-adv-search-submit';
+    submitBtn.textContent = '検索';
+    footer.appendChild(submitBtn);
 
     modal.appendChild(header);
     modal.appendChild(body);
     modal.appendChild(footer);
+
 
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
@@ -1325,8 +1339,8 @@
     const closeBtn = modal.querySelector('.karotter-adv-search-close');
     closeBtn.onclick = () => overlay.remove();
 
-    const submitBtn = modal.querySelector('.karotter-adv-search-submit');
-    submitBtn.onclick = () => {
+    const searchSubmitBtn = modal.querySelector('.karotter-adv-search-submit');
+    searchSubmitBtn.onclick = () => {
       const allWords = modal.querySelector('#adv-all').value.trim();
       const exactPhrase = modal.querySelector('#adv-exact').value.trim();
       const anyWords = modal.querySelector('#adv-any').value.trim();
@@ -1939,60 +1953,25 @@
     return coordinates;
   }
 
-  function injectCustomFont(customFont) {
-    console.log("[Karotter] Attempting to inject custom font:", customFont ? customFont.name : "null");
-    if (!customFont || !customFont.dataUrl) {
-      console.warn("[Karotter] No custom font data found.");
-      return;
-    }
-    const fontName = 'karotter-custom-font';
-    const font = new FontFace(fontName, `url(${customFont.dataUrl})`);
-    font.load().then(f => {
-      document.fonts.forEach(existing => {
-        if (existing.family === fontName) {
-          document.fonts.delete(existing);
-        }
-      });
-      document.fonts.add(f);
-      console.log("[Karotter] Custom font injected via FontFace API successfully.");
-    }).catch(err => {
-      console.error("[Karotter] Custom font injection failed:", err);
-    });
-  }
-
   function applySettings(settings) {
-    console.log("[Karotter] Applying settings:", settings);
     if (!settings.enabled) {
-      console.log("[Karotter] Theme is disabled.");
       clearTheme();
       return;
     }
 
     const style = ensureStyleElement();
-    const css = engine.buildAppliedCss(settings);
-    style.textContent = css;
-    console.log("[Karotter] Injected CSS length:", css.length);
-
-    // Firefox specific fix for custom fonts
-    if (settings.fontSource === "custom" && settings.customFont && settings.customFont.dataUrl) {
-      injectCustomFont(settings.customFont);
-    }
+    style.textContent = engine.buildAppliedCss(settings);
 
     applyFeatures(settings.features || {});
     setupSocialMenuBackdrop(settings.background.enabled);
   }
 
-  console.log("[Karotter] content.js initialized. Loading settings...");
-  storage.loadSettings().then(applySettings).catch(err => {
-    console.error("[Karotter] Failed to load settings:", err);
-  });
+  storage.loadSettings().then(applySettings);
 
   chrome.storage.onChanged.addListener(function (changes, areaName) {
-    console.log("[Karotter] Storage changed:", changes);
     if (areaName !== "local" || !changes[storage.STORAGE_KEY]) {
       return;
     }
-    const nextSettings = storage.normalizeSettings(changes[storage.STORAGE_KEY].newValue);
-    applySettings(nextSettings);
+    applySettings(storage.normalizeSettings(changes[storage.STORAGE_KEY].newValue));
   });
 }());
