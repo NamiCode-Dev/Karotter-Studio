@@ -25,10 +25,28 @@
     "https://apikarotter.karon.jp/*",
     "https://*.apikarotter.karon.jp/*"
   ],
+  "icons": {
+    "16": "logo/icon16.png",
+    "32": "logo/icon32.png",
+    "48": "logo/icon48.png",
+    "128": "logo/icon128.png"
+  },
   "action": {
+    "default_icon": {
+      "16": "logo/icon16.png",
+      "32": "logo/icon32.png",
+      "48": "logo/icon48.png",
+      "128": "logo/icon128.png"
+    },
     "default_title": "Karotter Studio"
   },
   "sidebar_action": {
+    "default_icon": {
+      "16": "logo/icon16.png",
+      "32": "logo/icon32.png",
+      "48": "logo/icon48.png",
+      "128": "logo/icon128.png"
+    },
     "default_title": "Karotter Studio",
     "default_panel": "popup.html"
   },
