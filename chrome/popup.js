@@ -15,6 +15,7 @@
     saturationValue: document.getElementById("saturationValue"),
     lightnessRange: document.getElementById("lightnessRange"),
     lightnessValue: document.getElementById("lightnessValue"),
+    extractColorBtn: document.getElementById("extractColorBtn"),
     backgroundToggle: document.getElementById("backgroundToggle"),
     backgroundHelp: document.getElementById("backgroundHelp"),
     backgroundInput: document.getElementById("backgroundInput"),
@@ -27,6 +28,18 @@
     swatches: document.getElementById("swatches"),
     resetBtn: document.getElementById("resetBtn"),
     openSiteBtn: document.getElementById("openSiteBtn"),
+    // Generator Mode
+    creationModeControl: document.getElementById("creationModeControl"),
+    automaticSettings: document.getElementById("automaticSettings"),
+    manualSettings: document.getElementById("manualSettings"),
+    manualAccent: document.getElementById("manualAccent"),
+    manualAccentHex: document.getElementById("manualAccentHex"),
+    manualBg: document.getElementById("manualBg"),
+    manualBgHex: document.getElementById("manualBgHex"),
+    manualSurface: document.getElementById("manualSurface"),
+    manualSurfaceHex: document.getElementById("manualSurfaceHex"),
+    manualText: document.getElementById("manualText"),
+    manualTextHex: document.getElementById("manualTextHex"),
     // Features
     hideReactions: document.getElementById("hideReactions"),
     customTheme: document.getElementById("customTheme"),
@@ -49,6 +62,7 @@
     enableAdvancedSearch: document.getElementById("enableAdvancedSearch"),
     showBoardsLink: document.getElementById("showBoardsLink"),
     enableVBotCommands: document.getElementById("enableVBotCommands"),
+    enableYandereBotAssistant: document.getElementById("enableYandereBotAssistant"),
     hideReplies: document.getElementById("hideReplies"),
     enableUserProfileLinks: document.getElementById("enableUserProfileLinks"),
     showGlossaryLink: document.getElementById("showGlossaryLink"),
@@ -118,6 +132,42 @@
     elements.saturationValue.textContent = (generator.saturationShift > 0 ? "+" : "") + generator.saturationShift;
     elements.lightnessRange.value = String(generator.lightnessShift);
     elements.lightnessValue.textContent = (generator.lightnessShift > 0 ? "+" : "") + generator.lightnessShift;
+
+    // Creation Mode
+    if (elements.creationModeControl) {
+      const modeSegments = elements.creationModeControl.querySelectorAll(".segment");
+      const modeIndicator = elements.creationModeControl.querySelector(".segment-indicator");
+      
+      modeSegments.forEach((seg) => {
+        if (seg.dataset.value === (generator.creationMode || "automatic")) {
+          seg.classList.add("active");
+          modeIndicator.style.width = seg.offsetWidth + "px";
+          modeIndicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+        } else {
+          seg.classList.remove("active");
+        }
+      });
+      
+      elements.automaticSettings.style.display = (generator.creationMode === "manual") ? "none" : "";
+      elements.manualSettings.style.display = (generator.creationMode === "manual") ? "" : "none";
+    }
+
+    if (generator.manualPalette) {
+      syncManualPaletteUi(generator.manualPalette);
+    }
+  }
+
+  function syncManualPaletteUi(palette) {
+    if (!palette || palette.length !== 4) return;
+    
+    elements.manualAccent.value = palette[0];
+    elements.manualAccentHex.value = palette[0];
+    elements.manualBg.value = palette[1];
+    elements.manualBgHex.value = palette[1];
+    elements.manualSurface.value = palette[2];
+    elements.manualSurfaceHex.value = palette[2];
+    elements.manualText.value = palette[3];
+    elements.manualTextHex.value = palette[3];
   }
 
   function syncFontUi(fontFamily) {
@@ -302,7 +352,11 @@
     } else {
       elements.backgroundPreview.style.backgroundImage = "";
       elements.backgroundPreview.classList.remove("has-image");
-      elements.backgroundLabel.textContent = "画像をドラッグまたは選択";
+      elements.backgroundLabel.textContent = "画像をドラッグまたは選択 (GIF対応)";
+    }
+
+    if (elements.extractColorBtn) {
+      elements.extractColorBtn.disabled = !isBackgroundActive;
     }
   }
 
@@ -328,6 +382,7 @@
     elements.enableAdvancedSearch.checked = settings.features.enableAdvancedSearch;
     elements.showBoardsLink.checked = settings.features.showBoardsLink;
     elements.enableVBotCommands.checked = settings.features.enableVBotCommands;
+    elements.enableYandereBotAssistant.checked = settings.features.enableYandereBotAssistant;
     elements.hideReplies.checked = settings.features.hideReplies;
     elements.enableUserProfileLinks.checked = settings.features.enableUserProfileLinks;
     elements.showGlossaryLink.checked = settings.features.showGlossaryLink;
@@ -370,30 +425,40 @@
   function renderWithPreview(theme, background) {
     renderSwatches(getPreviewTheme(theme, background));
   }
-
   function readGeneratorFromUi() {
     const seed = engine.isHexColor(elements.seedHex.value)
       ? engine.normalizeHex(elements.seedHex.value)
       : elements.seedColor.value;
 
     return {
+      creationMode: settings.generator.creationMode || "automatic",
       seed: seed,
       mode: elements.modeSelect.value,
       saturationShift: Number(elements.saturationRange.value),
-      lightnessShift: Number(elements.lightnessRange.value)
+      lightnessShift: Number(elements.lightnessRange.value),
+      manualPalette: [
+        elements.manualAccent.value,
+        elements.manualBg.value,
+        elements.manualSurface.value,
+        elements.manualText.value
+      ]
     };
   }
 
   function getGeneratedTheme() {
     const generator = readGeneratorFromUi();
+    const theme = generator.creationMode === "manual"
+      ? engine.themeFromManualPalette(generator.manualPalette)
+      : engine.themeFromSeed(
+          generator.seed,
+          generator.mode,
+          generator.saturationShift,
+          generator.lightnessShift
+        );
+
     return {
       generator: generator,
-      theme: engine.themeFromSeed(
-        generator.seed,
-        generator.mode,
-        generator.saturationShift,
-        generator.lightnessShift
-      )
+      theme: theme
     };
   }
 
@@ -477,7 +542,51 @@
     });
   }
 
+  function extractDominantColor(dataUrl) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        // Scale down for performance
+        canvas.width = 50;
+        canvas.height = 50;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let r = 0, g = 0, b = 0, count = 0;
+        
+        for (let i = 0; i < data.length; i += 4) {
+          // Skip transparent or very light/dark pixels if necessary, 
+          // but for simple extraction average is often enough for a base color
+          r += data[i];
+          g += data[i + 1];
+          b += data[i + 2];
+          count++;
+        }
+        
+        r = Math.floor(r / count);
+        g = Math.floor(g / count);
+        b = Math.floor(b / count);
+        
+        resolve(engine.rgbToHex(r, g, b));
+      };
+      img.src = dataUrl;
+    });
+  }
+
   // Event Listeners
+  if (elements.extractColorBtn) {
+    elements.extractColorBtn.addEventListener("click", async function () {
+      if (!settings.background || !settings.background.imageDataUrl) return;
+      
+      const color = await extractDominantColor(settings.background.imageDataUrl);
+      elements.seedHex.value = color;
+      elements.seedColor.value = color;
+      scheduleThemeAutoApply();
+    });
+  }
+
   elements.seedColor.addEventListener("input", function () {
     elements.seedHex.value = elements.seedColor.value;
     scheduleThemeAutoApply();
@@ -513,6 +622,57 @@
     });
     
     scheduleThemeAutoApply();
+  });
+
+  // Creation Mode Segmented Control logic
+  elements.creationModeControl.addEventListener("click", function (e) {
+    const btn = e.target.closest(".segment");
+    if (!btn) return;
+    
+    const value = btn.dataset.value;
+    settings.generator.creationMode = value;
+    
+    const segments = elements.creationModeControl.querySelectorAll(".segment");
+    const indicator = elements.creationModeControl.querySelector(".segment-indicator");
+    
+    segments.forEach((seg) => {
+      if (seg === btn) {
+        seg.classList.add("active");
+        indicator.style.width = seg.offsetWidth + "px";
+        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+      } else {
+        seg.classList.remove("active");
+      }
+    });
+    
+    elements.automaticSettings.style.display = (value === "manual") ? "none" : "";
+    elements.manualSettings.style.display = (value === "manual") ? "" : "none";
+    
+    scheduleThemeAutoApply();
+  });
+
+  // Manual Palette Listeners
+  [
+    { el: elements.manualAccent, hex: elements.manualAccentHex },
+    { el: elements.manualBg, hex: elements.manualBgHex },
+    { el: elements.manualSurface, hex: elements.manualSurfaceHex },
+    { el: elements.manualText, hex: elements.manualTextHex }
+  ].forEach(item => {
+    // Sync from color picker to hex input
+    item.el.addEventListener("input", function() {
+      item.hex.value = item.el.value;
+      scheduleThemeAutoApply();
+    });
+
+    // Sync from hex input to color picker
+    item.hex.addEventListener("input", function() {
+      const value = item.hex.value.trim();
+      if (engine.isHexColor(value)) {
+        const normalized = engine.normalizeHex(value);
+        item.el.value = normalized;
+        scheduleThemeAutoApply();
+      }
+    });
   });
 
   // Font Segmented Control logic (bundled fonts)
@@ -803,7 +963,7 @@
   });
 
   // Feature Toggles
-  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch", "showBoardsLink", "enableVBotCommands", "hideReplies", "enableUserProfileLinks", "showGlossaryLink", "enableModernLinkPreview"].forEach(featureKey => {
+  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch", "showBoardsLink", "enableVBotCommands", "enableYandereBotAssistant", "hideReplies", "enableUserProfileLinks", "showGlossaryLink", "enableModernLinkPreview"].forEach(featureKey => {
     const el = elements[featureKey];
     if (el) {
       el.addEventListener("change", function () {

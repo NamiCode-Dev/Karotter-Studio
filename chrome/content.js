@@ -1381,36 +1381,6 @@
     if (firstInput) firstInput.focus();
   }
 
-  function setupVBotCommands(enabled) {
-    if (vbotInterval) {
-      clearInterval(vbotInterval);
-      vbotInterval = null;
-    }
-
-    if (!enabled) {
-      hideVBotCard();
-      return;
-    }
-
-    vbotInterval = setInterval(() => {
-      const textareas = document.querySelectorAll('textarea[placeholder="いまどうしてる？"], textarea[placeholder="メッセージ..."]');
-      textareas.forEach(textarea => {
-        if (!textarea.dataset.vbotAttached) {
-          textarea.addEventListener('input', (e) => {
-            vbotAttachedTextarea = e.target;
-            handleVBotInput(e);
-          });
-          textarea.addEventListener('keydown', (e) => {
-            vbotAttachedTextarea = e.target;
-            handleVBotKeyDown(e);
-          });
-          textarea.addEventListener('blur', handleVBotBlur);
-          textarea.dataset.vbotAttached = 'true';
-        }
-      });
-    }, 500);
-  }
-
   function isHigh28BotDM() {
     const headers = document.querySelectorAll('div.border-b');
     for (const header of headers) {
@@ -1430,6 +1400,7 @@
     const text = textarea.value;
     const cursorPos = textarea.selectionStart;
 
+    // Find the start of the current word
     const lastAtPos = text.lastIndexOf('!', cursorPos);
     if (lastAtPos === -1 || (lastAtPos > 0 && text[lastAtPos - 1] !== ' ' && text[lastAtPos - 1] !== '\n')) {
       hideYandereCard();
@@ -1474,6 +1445,36 @@
 
   function handleYandereBlur() {
     setTimeout(hideYandereCard, 200);
+  }
+
+  function setupVBotCommands(enabled) {
+    if (vbotInterval) {
+      clearInterval(vbotInterval);
+      vbotInterval = null;
+    }
+
+    if (!enabled) {
+      hideVBotCard();
+      return;
+    }
+
+    vbotInterval = setInterval(() => {
+      const textareas = document.querySelectorAll('textarea[placeholder="いまどうしてる？"], textarea[placeholder="メッセージ..."]');
+      textareas.forEach(textarea => {
+        if (!textarea.dataset.vbotAttached) {
+          textarea.addEventListener('input', (e) => {
+            vbotAttachedTextarea = e.target;
+            handleVBotInput(e);
+          });
+          textarea.addEventListener('keydown', (e) => {
+            vbotAttachedTextarea = e.target;
+            handleVBotKeyDown(e);
+          });
+          textarea.addEventListener('blur', handleVBotBlur);
+          textarea.dataset.vbotAttached = 'true';
+        }
+      });
+    }, 500);
   }
 
   function setupYandereBotCommands(enabled) {
