@@ -109,6 +109,19 @@
     void message;
   }
 
+  function updateSegmentedIndicator(indicator, activeSegment) {
+    if (!indicator || !activeSegment) return;
+    const update = () => {
+      if (!activeSegment.offsetWidth) return;
+      indicator.style.width = activeSegment.offsetWidth + "px";
+      indicator.style.transform = `translateX(${activeSegment.offsetLeft - 4}px)`;
+    };
+    update();
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(update);
+    }
+  }
+
   function syncGeneratorUi(generator) {
     elements.seedColor.value = generator.seed;
     elements.seedHex.value = generator.seed;
@@ -120,8 +133,7 @@
     segments.forEach((seg, index) => {
       if (seg.dataset.value === generator.mode) {
         seg.classList.add("active");
-        indicator.style.width = seg.offsetWidth + "px";
-        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+        updateSegmentedIndicator(indicator, seg);
       } else {
         seg.classList.remove("active");
       }
@@ -141,8 +153,7 @@
       modeSegments.forEach((seg) => {
         if (seg.dataset.value === (generator.creationMode || "automatic")) {
           seg.classList.add("active");
-          modeIndicator.style.width = seg.offsetWidth + "px";
-          modeIndicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+          updateSegmentedIndicator(modeIndicator, seg);
         } else {
           seg.classList.remove("active");
         }
@@ -178,8 +189,7 @@
     segments.forEach((seg) => {
       if (seg.dataset.value === fontFamily) {
         seg.classList.add("active");
-        indicator.style.width = seg.offsetWidth + "px";
-        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+        updateSegmentedIndicator(indicator, seg);
       } else {
         seg.classList.remove("active");
       }
@@ -196,8 +206,7 @@
     segments.forEach((seg) => {
       if (seg.dataset.value === fontSource) {
         seg.classList.add("active");
-        indicator.style.width = seg.offsetWidth + "px";
-        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+        updateSegmentedIndicator(indicator, seg);
       } else {
         seg.classList.remove("active");
       }
@@ -252,8 +261,7 @@
     segments.forEach((seg) => {
       if (seg.dataset.value === theme) {
         seg.classList.add("active");
-        indicator.style.width = seg.offsetWidth + "px";
-        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+        updateSegmentedIndicator(indicator, seg);
       } else {
         seg.classList.remove("active");
       }
@@ -614,8 +622,7 @@
     segments.forEach((seg, index) => {
       if (seg === btn) {
         seg.classList.add("active");
-        indicator.style.width = seg.offsetWidth + "px";
-        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+        updateSegmentedIndicator(indicator, seg);
       } else {
         seg.classList.remove("active");
       }
@@ -638,8 +645,7 @@
     segments.forEach((seg) => {
       if (seg === btn) {
         seg.classList.add("active");
-        indicator.style.width = seg.offsetWidth + "px";
-        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+        updateSegmentedIndicator(indicator, seg);
       } else {
         seg.classList.remove("active");
       }
@@ -689,8 +695,7 @@
     segments.forEach((seg) => {
       if (seg === btn) {
         seg.classList.add("active");
-        indicator.style.width = seg.offsetWidth + "px";
-        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+        updateSegmentedIndicator(indicator, seg);
       } else {
         seg.classList.remove("active");
       }
@@ -715,8 +720,7 @@
     segments.forEach((seg) => {
       if (seg === btn) {
         seg.classList.add("active");
-        indicator.style.width = seg.offsetWidth + "px";
-        indicator.style.transform = `translateX(${seg.offsetLeft - 4}px)`;
+        updateSegmentedIndicator(indicator, seg);
       } else {
         seg.classList.remove("active");
       }
@@ -1000,13 +1004,10 @@
 
       // Re-sync UI that depends on layout/measurements when tab becomes visible
       if (settings) {
-        if (tabId === "appearance") {
-          syncGeneratorUi(settings.generator);
-          syncFontUi(settings.fontFamily || "system");
-          syncFontSourceUi(settings.fontSource || "system");
-        } else if (tabId === "advanced") {
-          syncAppThemeUi(settings.appTheme || "system");
-        }
+        syncGeneratorUi(settings.generator);
+        syncFontUi(settings.fontFamily || "system");
+        syncFontSourceUi(settings.fontSource || "system");
+        syncAppThemeUi(settings.appTheme || "system");
       }
     });
   });

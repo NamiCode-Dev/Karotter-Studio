@@ -5,7 +5,7 @@
   function getDefaultSettings() {
     return {
       version: 1,
-      enabled: false,
+      enabled: true,
       theme: Object.assign({}, engine.defaultTheme),
       background: {
         enabled: false,
