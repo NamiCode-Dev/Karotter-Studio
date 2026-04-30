@@ -22,6 +22,8 @@
   --danger: #ff453a;
   --font-main: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
   --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --link: #007aff;
+  --link-hover: #0056b3;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -36,6 +38,8 @@
     --accent: #ffffff;
     --accent-faint: #111111;
     --success: #ffffff;
+    --link: #409cff;
+    --link-hover: #70b5ff;
   }
 }
 
@@ -51,6 +55,8 @@ html[data-theme="light"] {
   --accent: #111111;
   --accent-faint: #f5f5f5;
   --success: #111111;
+  --link: #007aff;
+  --link-hover: #0056b3;
 }
 
 html[data-theme="dark"] {
@@ -65,6 +71,8 @@ html[data-theme="dark"] {
   --accent: #ffffff;
   --accent-faint: #111111;
   --success: #ffffff;
+  --link: #409cff;
+  --link-hover: #70b5ff;
 }
 
 * {
@@ -115,7 +123,7 @@ body {
 }
 
 .hero-copy {
-  display: none;
+  /* display: none; - Removed to ensure visibility and correct styling */
 }
 
 /* Typography */
@@ -178,6 +186,29 @@ h2 {
 .toggle-row.sub-option:last-child,
 .field.sub-option:last-child {
   border-bottom: none;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.clickable-row:hover {
+  background: var(--bg-hover);
+}
+
+.clickable-row:active {
+  background: var(--accent-faint);
+}
+
+.clickable-row svg {
+  color: var(--text-faint);
+  transition: color var(--transition);
+  flex-shrink: 0;
+}
+
+.clickable-row:hover svg {
+  color: var(--text-main);
 }
 
 /* Info inside rows */
@@ -551,10 +582,22 @@ input[type="text"] {
   border-top: 1px solid var(--border);
 }
 
-.panel>p a {
-  color: var(--text-main);
-  text-decoration: none;
-  border-bottom: 1px solid var(--text-main);
+.hero-copy a,
+.hero-copy a:visited {
+  color: var(--link) !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(0, 122, 255, 0.3) !important;
+  transition: all var(--transition) !important;
+  font-weight: 500 !important;
+  padding: 0 2px !important;
+  margin: 0 -2px !important;
+  border-radius: 4px !important;
+}
+
+.hero-copy a:hover {
+  color: var(--link-hover) !important;
+  background: var(--accent-faint) !important;
+  border-bottom-color: var(--link-hover) !important;
 }
 
 /* Tab Nav */

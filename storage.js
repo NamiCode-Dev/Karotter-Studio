@@ -45,7 +45,10 @@
         hideReplies: false,
         enableUserProfileLinks: false,
         showGlossaryLink: false,
-        enableModernLinkPreview: false
+        enableModernLinkPreview: false,
+        enableContentWidth: false,
+        contentWidth: 100,
+        enableThemeScrollbar: false
       },
       fontFamily: "system",
       fontSource: "system",
@@ -118,7 +121,10 @@
       hideReplies: !!f.hideReplies,
       enableUserProfileLinks: !!f.enableUserProfileLinks,
       showGlossaryLink: !!f.showGlossaryLink,
-      enableModernLinkPreview: !!f.enableModernLinkPreview
+      enableModernLinkPreview: !!f.enableModernLinkPreview,
+      enableContentWidth: !!f.enableContentWidth,
+      contentWidth: engine.clamp(Number(f.contentWidth) || 100, 30, 100),
+      enableThemeScrollbar: !!f.enableThemeScrollbar
     };
   }
 

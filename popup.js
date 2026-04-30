@@ -67,6 +67,11 @@
     enableUserProfileLinks: document.getElementById("enableUserProfileLinks"),
     showGlossaryLink: document.getElementById("showGlossaryLink"),
     enableModernLinkPreview: document.getElementById("enableModernLinkPreview"),
+    enableContentWidth: document.getElementById("enableContentWidth"),
+    contentWidthSubOption: document.getElementById("contentWidthSubOption"),
+    contentWidthValue: document.getElementById("contentWidthValue"),
+    contentWidthRange: document.getElementById("contentWidthRange"),
+    enableThemeScrollbar: document.getElementById("enableThemeScrollbar"),
     // Font - bundled
     fontSelect: document.getElementById("fontSelect"),
     fontSegmentedControl: document.getElementById("fontSegmentedControl"),
@@ -395,6 +400,10 @@
     elements.enableUserProfileLinks.checked = settings.features.enableUserProfileLinks;
     elements.showGlossaryLink.checked = settings.features.showGlossaryLink;
     elements.enableModernLinkPreview.checked = settings.features.enableModernLinkPreview;
+    elements.enableContentWidth.checked = settings.features.enableContentWidth;
+    elements.contentWidthRange.value = String(settings.features.contentWidth);
+    elements.contentWidthValue.textContent = settings.features.contentWidth + "%";
+    elements.enableThemeScrollbar.checked = settings.features.enableThemeScrollbar;
     updateSubOptionStates();
   }
 
@@ -411,6 +420,11 @@
     if (spoilerSub) {
       spoilerSub.style.opacity = isSpoilerEnabled ? "1" : "0.5";
       spoilerSub.style.pointerEvents = isSpoilerEnabled ? "auto" : "none";
+    }
+
+    const isContentWidthEnabled = elements.enableContentWidth.checked;
+    if (elements.contentWidthSubOption) {
+      elements.contentWidthSubOption.style.display = isContentWidthEnabled ? "block" : "none";
     }
   }
 
@@ -967,11 +981,11 @@
   });
 
   // Feature Toggles
-  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch", "showBoardsLink", "enableVBotCommands", "enableYandereBotAssistant", "hideReplies", "enableUserProfileLinks", "showGlossaryLink", "enableModernLinkPreview"].forEach(featureKey => {
+  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch", "showBoardsLink", "enableVBotCommands", "enableYandereBotAssistant", "hideReplies", "enableUserProfileLinks", "showGlossaryLink", "enableModernLinkPreview", "enableContentWidth", "enableThemeScrollbar"].forEach(featureKey => {
     const el = elements[featureKey];
     if (el) {
       el.addEventListener("change", function () {
-        if (featureKey === "collapseSidebarSections" || featureKey === "hideSpoilers") {
+        if (featureKey === "collapseSidebarSections" || featureKey === "hideSpoilers" || featureKey === "enableContentWidth") {
           updateSubOptionStates();
         }
         const nextFeatures = Object.assign({}, settings.features, {
@@ -1002,6 +1016,9 @@
       elements.tabBtns.forEach(b => b.classList.toggle("active", b === btn));
       elements.tabPanes.forEach(p => p.classList.toggle("active", p.id === `${tabId}Tab`));
 
+      // Scroll to top when switching tabs
+      window.scrollTo(0, 0);
+
       // Re-sync UI that depends on layout/measurements when tab becomes visible
       if (settings) {
         syncGeneratorUi(settings.generator);
@@ -1027,6 +1044,23 @@
       Object.assign({}, settings.background, { imageOpacity: imageOpacity }),
       "更新中...",
       "保存しました。"
+    );
+  });
+
+  elements.contentWidthRange.addEventListener("input", function () {
+    const value = Number(elements.contentWidthRange.value);
+    elements.contentWidthValue.textContent = value + "%";
+    
+    const nextFeatures = Object.assign({}, settings.features, {
+      contentWidth: value
+    });
+    
+    schedulePersist(
+      Object.assign({}, settings, { features: nextFeatures }),
+      settings.theme,
+      settings.background,
+      "調整中...",
+      "幅の設定を保存しました。"
     );
   });
 

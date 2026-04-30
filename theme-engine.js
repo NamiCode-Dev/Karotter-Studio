@@ -580,6 +580,18 @@
     return nextTheme;
   }
 
+  function buildScrollbarCss(theme) {
+    const thumb = theme["accent"];
+    const track = theme["surface-soft"];
+    return [
+      "::-webkit-scrollbar { width: 12px !important; height: 12px !important; }",
+      "::-webkit-scrollbar-track { background: " + track + " !important; }",
+      "::-webkit-scrollbar-thumb { background: " + thumb + " !important; border: 3px solid " + track + " !important; border-radius: 10px !important; }",
+      "::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, " + thumb + ", #000 15%) !important; }",
+      "* { scrollbar-width: thin !important; scrollbar-color: " + thumb + " " + track + " !important; }"
+    ].join("\n");
+  }
+
   function buildUtilityOverrideCss() {
     return [
       "html, body, #root, [data-sonner-toast] { font-family: var(--app-font, inherit) !important; }",
@@ -742,6 +754,9 @@
     if (features.customTheme !== false) {
       parts.push(rootVars);
       parts.push(buildUtilityOverrideCss());
+      if (features.enableThemeScrollbar) {
+        parts.push(buildScrollbarCss(appliedTheme));
+      }
     }
     parts.push(buildBackgroundImageCss(background));
 
@@ -792,6 +807,7 @@
     buildCustomFontFaceCss: buildCustomFontFaceCss,
     buildGoogleFontImportCss: buildGoogleFontImportCss,
     buildBackgroundImageCss: buildBackgroundImageCss,
+    buildScrollbarCss: buildScrollbarCss,
     buildAppliedCss: buildAppliedCss,
     fontMap: fontMap,
     parseCssText: parseCssText
