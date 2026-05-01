@@ -48,7 +48,9 @@
         enableModernLinkPreview: false,
         enableContentWidth: false,
         contentWidth: 100,
-        enableThemeScrollbar: false
+        enableThemeScrollbar: false,
+        enableLinkPreviewHover: false,
+        enableConnectionSwitcher: false
       },
       fontFamily: "system",
       fontSource: "system",
@@ -124,7 +126,9 @@
       enableModernLinkPreview: !!f.enableModernLinkPreview,
       enableContentWidth: !!f.enableContentWidth,
       contentWidth: engine.clamp(Number(f.contentWidth) || 100, 30, 100),
-      enableThemeScrollbar: !!f.enableThemeScrollbar
+      enableThemeScrollbar: !!f.enableThemeScrollbar,
+      enableLinkPreviewHover: !!f.enableLinkPreviewHover,
+      enableConnectionSwitcher: !!f.enableConnectionSwitcher
     };
   }
 

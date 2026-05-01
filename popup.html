@@ -30,7 +30,7 @@
           <div class="section-head">
             <h2>カラーテーマ</h2>
           </div>
-          <div class="ios-list-group">
+          <div class="studio-list-group">
             <label class="toggle-row mini" for="customTheme">
               <div class="toggle-info">
                 <div class="toggle-title">
@@ -290,7 +290,7 @@
                         <path
                           d="M3.688 3.037a.497.497 0 0 0-.651.651l6.5 15.999a.501.501 0 0 0 .947-.062l1.569-6.083a2 2 0 0 1 1.448-1.479l6.124-1.579a.5.5 0 0 0 .063-.947z" />
                       </svg>
-                      スクロールバーをテーマ化
+                      スクロールバーをテーマ化<span class="new-badge">New</span>
                     </div>
                   <div class="toggle-desc">スクロールバーの色をテーマのアクセントカラーに合わせます</div>
                 </div>
@@ -305,7 +305,7 @@
           <div class="section-head">
             <h2>パレットモニター</h2>
           </div>
-          <div class="ios-list-group swatches-monitor" id="swatches"></div>
+          <div class="studio-list-group swatches-monitor" id="swatches"></div>
         </section>
 
 
@@ -315,9 +315,90 @@
       <div id="displayTab" class="tab-pane">
         <section class="panel">
           <div class="section-head">
+            <h2>レイアウト</h2>
+          </div>
+          <div class="studio-list-group features-list">
+            <label class="toggle-row mini" for="enableContentWidth">
+              <div class="toggle-info">
+                <div class="toggle-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-ruler">
+                    <path d="M10 15v-3" />
+                    <path d="M14 15v-3" />
+                    <path d="M18 15v-3" />
+                    <path d="M2 8V4" />
+                    <path d="M22 6H2" />
+                    <path d="M22 8V4" />
+                    <path d="M6 15v-3" />
+                    <rect x="2" y="12" width="20" height="8" rx="2" />
+                  </svg>
+                  コンテンツ最大幅を変更<span class="new-badge">New</span>
+                </div>
+                <div class="toggle-desc">コンテンツの表示幅を調整します</div>
+              </div>
+              <span class="switch small"><input id="enableContentWidth" type="checkbox"><span
+                  class="switch-ui"></span></span>
+            </label>
+            <div class="sub-option" id="contentWidthSubOption" style="display: none; padding: 12px 16px 16px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <span
+                  style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">幅の割合</span>
+                <span id="contentWidthValue"
+                  style="font-size: 13px; font-weight: 700; color: var(--accent);">100%</span>
+              </div>
+              <input type="range" id="contentWidthRange" min="30" max="100" step="1" value="100"
+                style="width: 100%; height: 6px; border-radius: 3px; background: var(--surface-soft); accent-color: var(--accent); cursor: pointer;">
+            </div>
+
+
+            <label class="toggle-row mini" for="collapseSidebarSections">
+              <div class="toggle-info">
+                <div class="toggle-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-panel-right">
+                    <rect width="18" height="18" x="3" y="3" rx="2" />
+                    <path d="M15 3v18" />
+                  </svg>
+                  サイドバーの折りたたみ
+                </div>
+                <div class="toggle-desc">左側のメニューをアイコンのみのコンパクトな表示にします</div>
+              </div>
+              <span class="switch small"><input id="collapseSidebarSections" type="checkbox"><span
+                  class="switch-ui"></span></span>
+            </label>
+            <label class="toggle-row mini sub-option" for="collapseSidebarInitially">
+              <div class="toggle-info">
+                <div class="toggle-title">初期状態で折りたたむ</div>
+                <div class="toggle-desc">画面を開いたときに自動でサイドバーを折りたたみます</div>
+              </div>
+              <span class="switch small"><input id="collapseSidebarInitially" type="checkbox"><span
+                  class="switch-ui"></span></span>
+            </label>
+            <label class="toggle-row mini" for="autoExpandMore">
+              <div class="toggle-info">
+                <div class="toggle-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-chevron-down">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                  「もっと見る」を自動展開
+                </div>
+                <div class="toggle-desc">省略されたテキストやスレッドを最初からすべて表示します</div>
+              </div>
+              <span class="switch small"><input id="autoExpandMore" type="checkbox"><span
+                  class="switch-ui"></span></span>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
             <h2>投稿・アクション</h2>
           </div>
-          <div class="ios-list-group features-list">
+          <div class="studio-list-group features-list">
             <label class="toggle-row mini" for="hideReplies">
               <div class="toggle-info">
                 <div class="toggle-title">
@@ -404,90 +485,9 @@
 
         <section class="panel">
           <div class="section-head">
-            <h2>レイアウト</h2>
-          </div>
-          <div class="ios-list-group features-list">
-            <label class="toggle-row mini" for="enableContentWidth">
-              <div class="toggle-info">
-                <div class="toggle-title">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-ruler">
-                    <path d="M10 15v-3" />
-                    <path d="M14 15v-3" />
-                    <path d="M18 15v-3" />
-                    <path d="M2 8V4" />
-                    <path d="M22 6H2" />
-                    <path d="M22 8V4" />
-                    <path d="M6 15v-3" />
-                    <rect x="2" y="12" width="20" height="8" rx="2" />
-                  </svg>
-                  コンテンツ最大幅を変更
-                </div>
-                <div class="toggle-desc">コンテンツの表示幅を調整します</div>
-              </div>
-              <span class="switch small"><input id="enableContentWidth" type="checkbox"><span
-                  class="switch-ui"></span></span>
-            </label>
-            <div class="sub-option" id="contentWidthSubOption" style="display: none; padding: 12px 16px 16px;">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                <span
-                  style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">幅の割合</span>
-                <span id="contentWidthValue"
-                  style="font-size: 13px; font-weight: 700; color: var(--accent);">100%</span>
-              </div>
-              <input type="range" id="contentWidthRange" min="30" max="100" step="1" value="100"
-                style="width: 100%; height: 6px; border-radius: 3px; background: var(--surface-soft); accent-color: var(--accent); cursor: pointer;">
-            </div>
-
-
-            <label class="toggle-row mini" for="collapseSidebarSections">
-              <div class="toggle-info">
-                <div class="toggle-title">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-panel-right">
-                    <rect width="18" height="18" x="3" y="3" rx="2" />
-                    <path d="M15 3v18" />
-                  </svg>
-                  サイドバーの折りたたみ
-                </div>
-                <div class="toggle-desc">左側のメニューをアイコンのみのコンパクトな表示にします</div>
-              </div>
-              <span class="switch small"><input id="collapseSidebarSections" type="checkbox"><span
-                  class="switch-ui"></span></span>
-            </label>
-            <label class="toggle-row mini sub-option" for="collapseSidebarInitially">
-              <div class="toggle-info">
-                <div class="toggle-title">初期状態で折りたたむ</div>
-                <div class="toggle-desc">画面を開いたときに自動でサイドバーを折りたたみます</div>
-              </div>
-              <span class="switch small"><input id="collapseSidebarInitially" type="checkbox"><span
-                  class="switch-ui"></span></span>
-            </label>
-            <label class="toggle-row mini" for="autoExpandMore">
-              <div class="toggle-info">
-                <div class="toggle-title">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-chevron-down">
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                  「もっと見る」を自動展開
-                </div>
-                <div class="toggle-desc">省略されたテキストやスレッドを最初からすべて表示します</div>
-              </div>
-              <span class="switch small"><input id="autoExpandMore" type="checkbox"><span
-                  class="switch-ui"></span></span>
-            </label>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="section-head">
             <h2>プロフィール・マーク</h2>
           </div>
-          <div class="ios-list-group features-list">
+          <div class="studio-list-group features-list">
             <label class="toggle-row mini" for="hideIdentityMark">
               <div class="toggle-info">
                 <div class="toggle-title">
@@ -606,9 +606,9 @@
       <div id="toolsTab" class="tab-pane">
         <section class="panel">
           <div class="section-head">
-            <h2>ナビゲーション</h2>
+            <h2>UI・機能拡張</h2>
           </div>
-          <div class="ios-list-group features-list">
+          <div class="studio-list-group features-list">
             <label class="toggle-row mini" for="enableAdvancedSearch">
               <div class="toggle-info">
                 <div class="toggle-title">
@@ -623,6 +623,48 @@
                 <div class="toggle-desc">検索オプションを拡張し、日付や条件指定を簡単にします</div>
               </div>
               <span class="switch small"><input id="enableAdvancedSearch" type="checkbox"><span
+                  class="switch-ui"></span></span>
+            </label>
+            <label class="toggle-row mini" for="enableUserProfileLinks">
+              <div class="toggle-info">
+                <div class="toggle-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-user-check">
+                    <path d="m16 11 2 2 4-4" />
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                  </svg>
+                  ユーザープロフィールリンク化
+                </div>
+                <div class="toggle-desc">投稿内のID（@〜）をクリック可能なリンクに変換します</div>
+              </div>
+              <span class="switch small"><input id="enableUserProfileLinks" type="checkbox"><span
+                  class="switch-ui"></span></span>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <h2>ナビゲーション</h2>
+          </div>
+          <div class="studio-list-group features-list">
+            <label class="toggle-row mini" for="enableConnectionSwitcher">
+              <div class="toggle-info">
+                <div class="toggle-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-globe-icon lucide-globe">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                    <path d="M2 12h20" />
+                  </svg>
+                  接続を変更機能を追加<span class="new-badge">New</span>
+                </div>
+                <div class="toggle-desc">サイドバーにドメインを切り替えるメニューを追加します</div>
+              </div>
+              <span class="switch small"><input id="enableConnectionSwitcher" type="checkbox"><span
                   class="switch-ui"></span></span>
             </label>
             <label class="toggle-row mini" for="showBoardsLink">
@@ -662,23 +704,6 @@
               <span class="switch small"><input id="showGlossaryLink" type="checkbox"><span
                   class="switch-ui"></span></span>
             </label>
-            <label class="toggle-row mini" for="enableUserProfileLinks">
-              <div class="toggle-info">
-                <div class="toggle-title">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-user-check">
-                    <path d="m16 11 2 2 4-4" />
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                  </svg>
-                  ユーザープロフィールリンク化
-                </div>
-                <div class="toggle-desc">投稿内のID（@〜）をクリック可能なリンクに変換します</div>
-              </div>
-              <span class="switch small"><input id="enableUserProfileLinks" type="checkbox"><span
-                  class="switch-ui"></span></span>
-            </label>
           </div>
         </section>
 
@@ -686,7 +711,7 @@
           <div class="section-head">
             <h2>メディア機能</h2>
           </div>
-          <div class="ios-list-group features-list">
+          <div class="studio-list-group features-list">
             <label class="toggle-row mini" for="enableModernLinkPreview">
               <div class="toggle-info">
                 <div class="toggle-title">
@@ -702,6 +727,23 @@
                 <div class="toggle-desc">共有リンクのカードをスタイリッシュなデザインに変更します</div>
               </div>
               <span class="switch small"><input id="enableModernLinkPreview" type="checkbox"><span
+                  class="switch-ui"></span></span>
+            </label>
+            <label class="toggle-row mini" for="enableLinkPreviewHover">
+              <div class="toggle-info">
+                <div class="toggle-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-external-link">
+                    <path d="M15 3h6v6" />
+                    <path d="M10 14 21 3" />
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  </svg>
+                  ホバーでサイトプレビュー<span class="new-badge">New</span>
+                </div>
+                <div class="toggle-desc">リンクにホバーするとサイトの内容をポップアップで表示します</div>
+              </div>
+              <span class="switch small"><input id="enableLinkPreviewHover" type="checkbox"><span
                   class="switch-ui"></span></span>
             </label>
             <label class="toggle-row mini" for="enhanceVideoPlayer">
@@ -738,6 +780,7 @@
               <span class="switch small"><input id="imageDownload" type="checkbox" checked><span
                   class="switch-ui"></span></span>
             </label>
+
           </div>
         </section>
 
@@ -745,7 +788,7 @@
           <div class="section-head">
             <h2>Bot アシスタント</h2>
           </div>
-          <div class="ios-list-group features-list">
+          <div class="studio-list-group features-list">
             <label class="toggle-row mini" for="enableVBotCommands">
               <div class="toggle-info">
                 <div class="toggle-title">
@@ -788,7 +831,7 @@
           <div class="section-head">
             <h2>一般</h2>
           </div>
-          <div class="ios-list-group">
+          <div class="studio-list-group">
             <label class="toggle-row mini" for="enabledToggle">
               <div class="toggle-info">
                 <div class="toggle-title">
@@ -826,7 +869,7 @@
           <div class="section-head">
             <h2>外観モード</h2>
           </div>
-          <div class="ios-list-group">
+          <div class="studio-list-group">
             <div class="field">
               <div class="segmented-control theme-control" id="appThemeControl">
                 <button type="button" class="segment active" data-value="system">システム</button>
@@ -842,7 +885,7 @@
           <div class="section-head">
             <h2>About</h2>
           </div>
-          <div class="ios-list-group">
+          <div class="studio-list-group">
             <p class="hero-copy" style="display: block; background: var(--bg-panel-solid); margin: 0; padding: 16px;">
               Karotter Studio Version 1.7.0<br><br>
               This product uses <a href="https://lucide.dev/" target="_blank">Lucide Icons</a> (derived from <a
@@ -856,7 +899,7 @@
           <div class="section-head">
             <h2>Developer</h2>
           </div>
-          <div class="ios-list-group">
+          <div class="studio-list-group">
             <div class="toggle-row mini">
               <div class="toggle-info">
                 <div class="toggle-title">NamiCode</div>

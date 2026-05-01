@@ -45,4 +45,72 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true; // Keep message channel open for async sendResponse
   }
+
+  // Handle link preview rule management
+  if (message.action === "setup_preview_rules") {
+    const url = new URL(message.url);
+    const domain = url.hostname;
+
+    chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: [1001, 1002],
+      addRules: [
+        {
+          id: 1001,
+          priority: 1,
+          action: {
+            type: "modifyHeaders",
+            responseHeaders: [
+              { header: "X-Frame-Options", operation: "remove" },
+              { header: "Frame-Options", operation: "remove" },
+              { header: "Content-Security-Policy", operation: "remove" },
+              { header: "Access-Control-Allow-Origin", operation: "set", value: "*" },
+              { header: "Access-Control-Allow-Methods", operation: "set", value: "GET, POST, OPTIONS, PUT, DELETE, PATCH" },
+              { header: "Access-Control-Allow-Headers", operation: "set", value: "*" },
+              { header: "Access-Control-Expose-Headers", operation: "set", value: "*" },
+              { header: "Access-Control-Allow-Credentials", operation: "set", value: "true" },
+              { header: "Cross-Origin-Resource-Policy", operation: "remove" },
+              { header: "Cross-Origin-Embedder-Policy", operation: "remove" },
+              { header: "Cross-Origin-Opener-Policy", operation: "remove" }
+            ]
+          },
+          condition: {
+            urlFilter: `||${domain}^`,
+            resourceTypes: ["main_frame", "sub_frame", "xmlhttprequest", "image", "media", "script", "stylesheet", "font", "other"]
+          }
+        },
+        {
+          id: 1002,
+          priority: 1,
+          action: {
+            type: "modifyHeaders",
+            responseHeaders: [
+              { header: "Content-Security-Policy", operation: "remove" },
+              { header: "X-Content-Security-Policy", operation: "remove" }
+            ]
+          },
+          condition: {
+            urlFilter: "||karotter.com^",
+            resourceTypes: ["main_frame", "sub_frame"]
+          }
+        }
+      ]
+    }, () => {
+      if (chrome.runtime.lastError) {
+        console.error("DNR Error:", chrome.runtime.lastError);
+        sendResponse({ success: false });
+      } else {
+        sendResponse({ success: true });
+      }
+    });
+    return true;
+  }
+
+  if (message.action === "clear_preview_rules") {
+    chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: [1001, 1002]
+    }, () => {
+      sendResponse({ success: true });
+    });
+    return true;
+  }
 });

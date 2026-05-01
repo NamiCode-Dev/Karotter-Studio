@@ -14,9 +14,11 @@
     "storage",
     "unlimitedStorage",
     "sidePanel",
-    "downloads"
+    "downloads",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
+    "<all_urls>",
     "https://karotter.com/*",
     "https://*.karotter.com/*",
     "https://karotter.jp/*",

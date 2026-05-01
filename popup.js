@@ -72,6 +72,8 @@
     contentWidthValue: document.getElementById("contentWidthValue"),
     contentWidthRange: document.getElementById("contentWidthRange"),
     enableThemeScrollbar: document.getElementById("enableThemeScrollbar"),
+    enableLinkPreviewHover: document.getElementById("enableLinkPreviewHover"),
+    enableConnectionSwitcher: document.getElementById("enableConnectionSwitcher"),
     // Font - bundled
     fontSelect: document.getElementById("fontSelect"),
     fontSegmentedControl: document.getElementById("fontSegmentedControl"),
@@ -404,6 +406,8 @@
     elements.contentWidthRange.value = String(settings.features.contentWidth);
     elements.contentWidthValue.textContent = settings.features.contentWidth + "%";
     elements.enableThemeScrollbar.checked = settings.features.enableThemeScrollbar;
+    elements.enableLinkPreviewHover.checked = settings.features.enableLinkPreviewHover;
+    elements.enableConnectionSwitcher.checked = settings.features.enableConnectionSwitcher;
     updateSubOptionStates();
   }
 
@@ -981,7 +985,7 @@
   });
 
   // Feature Toggles
-  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch", "showBoardsLink", "enableVBotCommands", "enableYandereBotAssistant", "hideReplies", "enableUserProfileLinks", "showGlossaryLink", "enableModernLinkPreview", "enableContentWidth", "enableThemeScrollbar"].forEach(featureKey => {
+  ["hideReactions", "customTheme", "hideViewCount", "hideIdentityMark", "hideOperatorMark", "hideVerifiedMark", "hideVerifiedGroupMark", "collapseSidebarSections", "collapseSidebarInitially", "hideSpoilers", "autoExpandMore", "imageDownload", "enhanceVideoPlayer", "hideQrCode", "hideProfileUrl", "enableAdvancedSearch", "enableConnectionSwitcher", "showBoardsLink", "enableVBotCommands", "enableYandereBotAssistant", "hideReplies", "enableUserProfileLinks", "showGlossaryLink", "enableModernLinkPreview", "enableLinkPreviewHover", "enableContentWidth", "enableThemeScrollbar"].forEach(featureKey => {
     const el = elements[featureKey];
     if (el) {
       el.addEventListener("change", function () {

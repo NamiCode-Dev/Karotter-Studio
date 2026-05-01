@@ -329,6 +329,32 @@
           font-weight: 400;
           color: #ffffff !important;
         }
+        
+        #ks-link-preview-popup {
+          pointer-events: auto !important;
+          border: 12px solid transparent;
+          background-clip: padding-box;
+          box-sizing: border-box;
+        }
+        @keyframes ksPreviewFadeIn {
+          from { opacity: 0; transform: translateY(10px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes ksPreviewFadeOut {
+          from { opacity: 1; transform: translateY(0) scale(1); }
+          to { opacity: 0; transform: translateY(10px) scale(0.95); }
+        }
+        .ks-preview-closing {
+          animation: ksPreviewFadeOut 0.15s cubic-bezier(0.2, 0, 0, 1) forwards !important;
+          pointer-events: none !important;
+        }
+        .ks-preview-loader {
+          position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(128,128,128,0.1);
+        }
+        .ks-spinner {
+          width: 24px; height: 24px; border: 3px solid rgba(128,128,128,0.2); border-top-color: var(--accent); border-radius: 50%; animation: ksRotate 0.8s linear infinite;
+        }
+        @keyframes ksRotate { to { transform: rotate(360deg); } }
       `;
     }
 
@@ -349,6 +375,8 @@
     setupHideReplies(features.hideReplies);
     setupUserProfileLinks(features.enableUserProfileLinks);
     setupReactionIcons(!features.hideReactions);
+    setupLinkPreviewHover(features.enableLinkPreviewHover);
+    setupConnectionSwitcher(features.enableConnectionSwitcher);
   }
 
   let reactionIconsInterval = null;
@@ -471,6 +499,145 @@
         }
       });
     }, 100);
+  }
+
+  let connectionSwitcherInterval = null;
+  function setupConnectionSwitcher(enabled) {
+    if (connectionSwitcherInterval) {
+      clearInterval(connectionSwitcherInterval);
+      connectionSwitcherInterval = null;
+    }
+
+    if (!enabled) {
+      document.querySelectorAll('.karotter-conn-btn').forEach(btn => btn.remove());
+      const modal = document.querySelector('.karotter-conn-modal-overlay');
+      if (modal) modal.remove();
+      return;
+    }
+
+    const GLOBE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe-icon lucide-globe"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`;
+
+    connectionSwitcherInterval = setInterval(() => {
+      const nav = document.querySelector('nav.space-y-2.flex-1');
+      if (!nav) return;
+
+      if (nav.querySelector('.karotter-conn-btn')) return;
+
+      // Find the last link in the nav to insert before it, or just append
+      const btn = document.createElement('a');
+      btn.href = '#';
+      btn.className = 'karotter-conn-btn flex items-center space-x-3 px-4 py-2 rounded-full transition-colors relative text-gray-700 hover:bg-gray-100';
+      btn.setAttribute('data-karotter-injected', 'true');
+      
+      const svgContainer = document.createElement('div');
+      svgContainer.className = 'relative';
+      svgContainer.insertAdjacentHTML('afterbegin', GLOBE_SVG);
+      
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'font-medium text-sm md:text-base';
+      labelSpan.textContent = '接続を変更';
+
+      btn.appendChild(svgContainer);
+      btn.appendChild(labelSpan);
+
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openConnectionSwitcherModal();
+      };
+
+      const target = nav.children[nav.children.length - 3];
+      if (target) {
+        nav.insertBefore(btn, target);
+      } else {
+        nav.appendChild(btn);
+      }
+    }, 100);
+  }
+
+  function openConnectionSwitcherModal() {
+    let overlay = document.querySelector('.karotter-conn-modal-overlay');
+    if (overlay) return;
+
+    overlay = document.createElement('div');
+    overlay.className = 'karotter-conn-modal-overlay karotter-adv-search-modal-overlay';
+    
+    overlay.onclick = (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
+      }
+    };
+
+    const modal = document.createElement('div');
+    modal.className = 'karotter-conn-modal karotter-adv-search-modal';
+    modal.style.width = '420px';
+    modal.onclick = (e) => e.stopPropagation();
+
+    const header = document.createElement('div');
+    header.className = 'karotter-adv-search-header';
+    const title = document.createElement('h2');
+    title.textContent = '接続を変更';
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'karotter-adv-search-close';
+    closeBtn.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`);
+    closeBtn.onclick = () => overlay.remove();
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+
+    const body = document.createElement('div');
+    body.className = 'karotter-adv-search-body';
+    
+    const currentHost = window.location.hostname;
+
+    const domains = [
+      { name: 'Karotter (.com)', front: 'karotter.com', api: 'api.karotter.com', url: 'https://karotter.com/' },
+      { name: 'Karotter (.jp)', front: 'karotter.jp', api: 'api.karotter.jp', url: 'https://karotter.jp/' },
+      { name: 'Karotter (karon.jp)', front: 'karotter.karon.jp', api: 'apikarotter.karon.jp', url: 'https://karotter.karon.jp/' }
+    ];
+
+    domains.forEach(d => {
+      const item = document.createElement('div');
+      const isCurrent = currentHost === d.front;
+      
+      item.style.cssText = `
+        padding: 16px;
+        border: 1px solid var(--border-soft);
+        border-radius: 12px;
+        cursor: ${isCurrent ? 'default' : 'pointer'};
+        transition: .2s;
+        background: ${isCurrent ? 'var(--accent-soft, rgba(29, 155, 240, 0.1))' : 'transparent'};
+        border-color: ${isCurrent ? 'var(--accent)' : 'var(--border-soft)'};
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      `;
+
+      item.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 800; color: ${isCurrent ? 'var(--accent)' : 'var(--text-primary)'}; font-size: 15px;">${d.name}</span>
+          ${isCurrent ? '<span style="font-size: 11px; padding: 2px 8px; background: var(--accent); color: white; border-radius: 99px; font-weight: bold;">接続中</span>' : ''}
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary); opacity: 0.8; margin-top: 2px;">
+          <div>Front: ${d.front}</div>
+          <div>API: ${d.api}</div>
+        </div>
+      `;
+
+      if (!isCurrent) {
+        item.onmouseover = () => { item.style.background = 'var(--surface-hover)'; };
+        item.onmouseout = () => { item.style.background = 'transparent'; };
+        item.onclick = () => {
+          window.location.href = d.url + window.location.pathname.substring(1) + window.location.search;
+        };
+      }
+
+      body.appendChild(item);
+    });
+
+    modal.appendChild(header);
+    modal.appendChild(body);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
   }
 
   function setupBoardsLink(enabled) {
@@ -633,6 +800,165 @@
       });
     }, 100);
   }
+
+  let linkPreviewHoverInterval = null;
+  let linkPreviewPopup = null;
+  let linkPreviewTimer = null;
+  let hidePreviewTimer = null;
+  let currentPreviewUrl = null;
+
+  function setupLinkPreviewHover(enabled) {
+    if (linkPreviewHoverInterval) {
+      clearInterval(linkPreviewHoverInterval);
+      linkPreviewHoverInterval = null;
+    }
+
+    if (!enabled) {
+      if (linkPreviewPopup) {
+        linkPreviewPopup.remove();
+        linkPreviewPopup = null;
+      }
+      return;
+    }
+
+    linkPreviewHoverInterval = setInterval(() => {
+      // Target link cards and standard external links
+      const links = document.querySelectorAll('a.ks-link-card, a.group.block.overflow-hidden.rounded-2xl');
+      links.forEach(link => {
+        if (link.dataset.ksPreviewAttached) return;
+        link.dataset.ksPreviewAttached = 'true';
+
+        link.addEventListener('mouseenter', (e) => {
+          clearTimeout(hidePreviewTimer);
+          const url = link.href;
+          if (!url || url.includes(location.host) || url.startsWith('javascript:')) return;
+
+          linkPreviewTimer = setTimeout(() => {
+            showLinkPreview(url, e.clientX, e.clientY);
+          }, 600);
+        });
+
+        link.addEventListener('mouseleave', () => {
+          clearTimeout(linkPreviewTimer);
+          hidePreviewTimer = setTimeout(hideLinkPreview, 800);
+        });
+      });
+    }, 500);
+  }
+
+  function showLinkPreview(url, x, y) {
+    if (currentPreviewUrl === url) {
+      if (linkPreviewPopup) linkPreviewPopup.style.display = 'flex';
+      return;
+    }
+    currentPreviewUrl = url;
+
+    const setupPopup = () => {
+      if (!linkPreviewPopup) {
+        linkPreviewPopup = document.createElement('div');
+        linkPreviewPopup.id = 'ks-link-preview-popup';
+        linkPreviewPopup.style.cssText = `
+          position: fixed;
+          width: 480px;
+          height: 320px;
+          z-index: 100000;
+          background: var(--surface-card, rgba(255,255,255,0.9));
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid var(--border-soft, rgba(255,255,255,0.2));
+          border-radius: 16px;
+          box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+          overflow: hidden;
+          pointer-events: auto;
+          display: none;
+          flex-direction: column;
+          animation: ksPreviewFadeIn 0.2s cubic-bezier(0.2, 0, 0, 1);
+          transform-origin: top center;
+        `;
+
+        linkPreviewPopup.addEventListener('mouseenter', () => {
+          clearTimeout(hidePreviewTimer);
+          if (linkPreviewPopup.classList.contains('ks-preview-closing')) {
+            linkPreviewPopup.classList.remove('ks-preview-closing');
+          }
+        });
+
+        linkPreviewPopup.addEventListener('mouseleave', () => {
+          hidePreviewTimer = setTimeout(hideLinkPreview, 800);
+        });
+        
+        const loader = document.createElement('div');
+        loader.className = 'ks-preview-loader';
+        loader.innerHTML = '<div class="ks-spinner"></div>';
+        linkPreviewPopup.appendChild(loader);
+
+        const iframe = document.createElement('iframe');
+        iframe.style.cssText = `
+          width: 100%;
+          height: 100%;
+          border: none;
+          opacity: 0;
+          transition: opacity 0.3s;
+          background: white;
+        `;
+        iframe.onload = () => {
+          iframe.style.opacity = '1';
+          loader.style.display = 'none';
+        };
+        linkPreviewPopup.appendChild(iframe);
+        document.body.appendChild(linkPreviewPopup);
+      }
+      return linkPreviewPopup;
+    };
+
+    const popup = setupPopup();
+    const iframe = popup.querySelector('iframe');
+    const loader = popup.querySelector('.ks-preview-loader');
+
+    // Position - slightly closer to cursor to bridge the gap
+    let top = y + 10;
+    let left = x - 240;
+    if (top + 320 > window.innerHeight) top = y - 330;
+    if (left < 10) left = 10;
+    if (left + 480 > window.innerWidth) left = window.innerWidth - 490;
+
+    popup.style.top = `${top}px`;
+    popup.style.left = `${left}px`;
+    popup.style.display = 'flex';
+    popup.classList.remove('ks-preview-closing');
+    iframe.style.opacity = '0';
+    loader.style.display = 'flex';
+
+    // Send message to background to allow this URL in iframe/CORS
+    chrome.runtime.sendMessage({ action: "setup_preview_rules", url: url }, (response) => {
+      // Ensure we are still hovering over the same URL
+      if (currentPreviewUrl === url) {
+        iframe.src = url;
+      }
+    });
+  }
+
+  function hideLinkPreview() {
+    if (!linkPreviewPopup || linkPreviewPopup.style.display === 'none' || linkPreviewPopup.classList.contains('ks-preview-closing')) return;
+
+    linkPreviewPopup.classList.add('ks-preview-closing');
+    
+    const onEnd = (e) => {
+      if (e.animationName === 'ksPreviewFadeOut') {
+        if (linkPreviewPopup.classList.contains('ks-preview-closing')) {
+          linkPreviewPopup.style.display = 'none';
+          linkPreviewPopup.classList.remove('ks-preview-closing');
+          linkPreviewPopup.querySelector('iframe').src = 'about:blank';
+          currentPreviewUrl = null;
+        }
+        linkPreviewPopup.removeEventListener('animationend', onEnd);
+      }
+    };
+    linkPreviewPopup.addEventListener('animationend', onEnd);
+
+    chrome.runtime.sendMessage({ action: "clear_preview_rules" });
+  }
+
 
   let profileButtonsInterval = null;
   function setupProfileButtonsHider(hideQr, hideUrl) {

@@ -20,7 +20,7 @@
   --accent-faint: #f5f5f5;
   --success: #111111;
   --danger: #ff453a;
-  --font-main: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  --font-main: system-ui, -apple-system, sans-serif;
   --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   --link: #007aff;
   --link-hover: #0056b3;
@@ -142,7 +142,7 @@ h2 {
 }
 
 /* Lists & Rows */
-.ios-list-group,
+.studio-list-group,
 .features-list,
 .settings-group,
 .background-config {
@@ -845,6 +845,17 @@ input[type="text"] {
   color: var(--text-faint);
   letter-spacing: 0.05em;
   margin-left: 8px;
+}
+
+.new-badge {
+  font-size: 9px;
+  background: var(--accent);
+  color: var(--bg-base);
+  padding: 2px 6px;
+  border-radius: 10px;
+  letter-spacing: 0.05em;
+  margin-left: 8px;
+  font-weight: 600;
 }
 
 .section-head-with-badge {
