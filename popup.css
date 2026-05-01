@@ -545,6 +545,7 @@ input[type="text"] {
 /* Swatches */
 .swatches-monitor {
   display: flex;
+  flex-direction: row;
   padding: 16px 0;
   gap: 8px;
 }
@@ -561,6 +562,8 @@ input[type="text"] {
 
 .swatch-color {
   flex: 1;
+  min-height: 34px;
+  width: 100%;
 }
 
 .swatch-copy {

@@ -315,7 +315,7 @@
 
       const color = document.createElement("div");
       color.className = "swatch-color";
-      color.style.background = theme[key];
+      color.style.background = theme[key] || "var(--border)";
 
       const copy = document.createElement("div");
       copy.className = "swatch-copy";
